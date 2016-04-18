@@ -1,0 +1,55 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1445469060000",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:CreateTags",
+        "ec2:RunInstances"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Sid": "Stmt1445469103000",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": [
+        "[%S3Bucket1%]/*",
+        "[%S3Bucket2%]/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "[%S3Bucket1%]/logs",
+        "[%S3Bucket1%]/logs/*",
+        "[%S3Bucket2%]/logs",
+        "[%S3Bucket2%]/logs/*"
+      ]
+    },
+    {
+      "Sid": "AllowAccessToSSM",
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:PutMetricData",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
+      ],
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+}
