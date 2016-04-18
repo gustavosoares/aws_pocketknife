@@ -20,7 +20,6 @@ module AwsPocketknife
       def start_instance_by_id(instance_id)
         puts "Start instance id: #{instance_id}"
         resp = @ec2_client.start_instances({ instance_ids: [instance_id.to_s] })
-
       end
 
       def describe_instance_by_id(instance_id)
