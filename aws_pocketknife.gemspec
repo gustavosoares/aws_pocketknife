@@ -31,8 +31,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'retryable', '~> 2.0'
   spec.add_dependency "rake", "~> 10.0"
   spec.add_dependency "rspec", "~> 3.4"
+  spec.add_dependency "webmock", "= 1.24.2"
 
   spec.add_development_dependency "bundler", "~> 1.11"
   spec.add_development_dependency "debase", "= 0.2.2.beta6"
-  spec.add_development_dependency "webmock", "= 1.24.2"
 end

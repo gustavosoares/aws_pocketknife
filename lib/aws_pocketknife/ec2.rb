@@ -10,16 +10,18 @@ module AwsPocketknife
 
     class << self
 
-      def stop_instance_by_id(instance_id)
-        puts "Stoping instance id: #{instance_id}"
-        resp = @ec2_client.stop_instances({ instance_ids: [instance_id.to_s] })
-        wait_till_instance_is_stopped(instance_id, max_attempts: MAX_ATTEMPTS, delay_seconds: DELAY_SECONDS)
-        puts "Stopped ec2 instance #{instance_id}"
+      def stop_instance_by_id(instance_ids)
+        instance_id_list = get_instance_id_list(instance_ids: instance_ids)
+        puts "Stoping instance id: #{instance_id_list}"
+        resp = @ec2_client.stop_instances({ instance_ids: instance_id_list })
+        wait_till_instance_is_stopped(instance_id_list, max_attempts: MAX_ATTEMPTS, delay_seconds: DELAY_SECONDS)
+        puts "Stopped ec2 instance #{instance_id_list}"
       end
 
-      def start_instance_by_id(instance_id)
-        puts "Start instance id: #{instance_id}"
-        resp = @ec2_client.start_instances({ instance_ids: [instance_id.to_s] })
+      def start_instance_by_id(instance_ids)
+        instance_id_list = get_instance_id_list(instance_ids: instance_ids)
+        puts "Start instance id: #{instance_id_list}"
+        resp = @ec2_client.start_instances({ instance_ids: instance_id_list })
       end
 
       def describe_instance_by_id(instance_id)
@@ -49,23 +51,27 @@ module AwsPocketknife
 
       private
 
+      def get_instance_id_list(instance_ids: "")
+        instance_ids.strip.split(";")
+      end
+
       def get_instance_state(instance_id)
         get_instance_status(instance_id).instance_state
       end
 
-      def wait_till_instance_is_stopped(instance_id, max_attempts: 12, delay_seconds: 10)
+      def wait_till_instance_is_stopped(instance_ids, max_attempts: 12, delay_seconds: 10)
         total_wait_seconds = max_attempts * delay_seconds;
-        puts "Waiting up to #{total_wait_seconds} seconds with #{delay_seconds} seconds delay for ec2 instance #{instance_id} to be stopped"
-        @ec2_client.wait_until(:instance_stopped, { instance_ids: [instance_id.to_s] }) do |w|
+        puts "Waiting up to #{total_wait_seconds} seconds with #{delay_seconds} seconds delay for ec2 instance #{instance_ids} to be stopped"
+        @ec2_client.wait_until(:instance_stopped, { instance_ids: instance_ids }) do |w|
           w.max_attempts = max_attempts
           w.delay = delay_seconds
         end
       end
 
-      def wait_till_instance_is_terminated(instance_id, max_attempts: 12, delay_seconds: 10)
+      def wait_till_instance_is_terminated(instance_ids, max_attempts: 12, delay_seconds: 10)
         total_wait_seconds = max_attempts * delay_seconds;
-        puts "Waiting up to #{total_wait_seconds} seconds with #{delay_seconds} seconds delay for ec2 instance #{instance_id} to be terminated"
-        @ec2_client.wait_until(:instance_terminated, { instance_ids: [instance_id.to_s] }) do |w|
+        puts "Waiting up to #{total_wait_seconds} seconds with #{delay_seconds} seconds delay for ec2 instance #{instance_ids} to be terminated"
+        @ec2_client.wait_until(:instance_terminated, { instance_ids: instance_ids }) do |w|
           w.max_attempts = max_attempts
           w.delay = delay_seconds
         end
