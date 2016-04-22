@@ -112,7 +112,7 @@ module AwsPocketknife
 
       def add_role_to_instance_profile(role_name,instance_profile_name)
         puts "Adding role #{role_name} to instance profile: #{instance_profile_name}"
-        @iamClient.add_role_to_instance_profile(instance_profile_name: instance_profile_name,role_name: role_name)
+        @iamClient.add_role_to_instance_profile(instance_profile_name: instance_profile_name, role_name: role_name)
         puts "Added role #{role_name} to instance profile: #{instance_profile_name}"
       end
 

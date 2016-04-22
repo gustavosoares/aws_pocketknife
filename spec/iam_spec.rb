@@ -90,37 +90,22 @@ describe AwsPocketknife::Iam do
       arn_number = '123'
 
       # Verify
-      expect_any_instance_of(Aws::IAM::Client).to receive(:attach_group_policy).with({group_name:group_name,policy_arn:arn_number})
-
-      # Act
-      AwsPocketknife::Iam.attach_policy_to_group(policy_name,group_name)
-
+      allow(AwsPocketknife::Iam).to receive(:get_policy_arn).with(policy_name).and_return(arn_number)
+      expect_any_instance_of(Aws::IAM::Client).to receive(:attach_group_policy).with(group_name: group_name, policy_arn: arn_number)
+      AwsPocketknife::Iam.attach_policy_to_group(policy_name, group_name)
 
 
     end
 
     it 'Should log when the policy cannot be found' do
       # Setup
+      # Setup
       group_name = 'testGroup'
       policy_name = 'testPolicy'
 
-      Aws.config[:iam] = {
-          stub_responses: {
-              list_policies: { policies:[
-                  {
-                      policy_name: 'testPolicyA',
-                      arn:'234'
-                  }]}
-          }
-      }
-
-      target = AwsCfHelpers::Admin::IdentityAndAccess.new
-      aws_client = target.instance_variable_get(:@iamClient)
-      allow(aws_client).to receive(:attach_user_policy)
-
       # Act
       printed = capture_stdout do
-        target.attach_policy_to_group(policy_name,group_name)
+        AwsPocketknife::Iam.attach_policy_to_group(policy_name, group_name)
       end
 
       # Verify
@@ -137,17 +122,12 @@ describe AwsPocketknife::Iam do
       username = 'testuser'
 
       # Act
-      target = AwsCfHelpers::Admin::IdentityAndAccess.new
-      aws_client = target.instance_variable_get(:@iamClient)
-      allow(aws_client).to receive(:add_user_to_group)
-
-      # Act
+      expect_any_instance_of(Aws::IAM::Client).to receive(:add_user_to_group).with({group_name:group_name,user_name:username})
       printed = capture_stdout do
-        target.add_user_to_group(username,group_name)
+        AwsPocketknife::Iam.add_user_to_group(username,group_name)
       end
 
       # Assert
-      expect(aws_client).to have_received(:add_user_to_group).with({group_name:group_name,user_name:username}).exactly(1).times
       expect(printed).to include("Attaching user: #{username} to group: #{group_name}")
     end
 
@@ -155,39 +135,36 @@ describe AwsPocketknife::Iam do
   end
 
   describe "#create_role"do
-=begin    Need to be able to load a file which dir are tests run from ?
+    #Need to be able to load a file which dir are tests run from ?
     it 'should create a row within aws using the specified role name and policy'do
       # Setup
       role_name = "testRole"
-      trust_relationship_file = IO.read
+      trust_relationship_file = "file.json"
+      trust_relationship = "mock"
 
-      target = AwsCfHelpers::Admin::IdentityAndAccess.new
-      aws_client = target.instance_variable_get(:@iamClient)
-      allow(aws_client).to receive(:create_role)
+      allow(IO).to receive(:read).with(trust_relationship_file).and_return(trust_relationship)
+      allow(File).to receive(:exist?).with(trust_relationship_file).and_return(true)
+
+      expect_any_instance_of(Aws::IAM::Client).to receive(:create_role).with(role_name: role_name, assume_role_policy_document: trust_relationship)
 
       # Act
       printed = capture_stdout do
-        target.create_role(role_name,trust_relationship_file)
+        AwsPocketknife::Iam.create_role(role_name,trust_relationship_file)
       end
 
       # Assert
-      expect(aws_client).to have_received(:create_role).with({role_name:role_name,assume_role_policy_document:trust_relationship_file}).exactly(1).times
-      expect(printed).to include("Creating role: #{role_name} with trust relationship #{trust_relationship_file}")
-      expect(printed).to include("Created role: #{role_name} with trust relationship #{trust_relationship_file}")
+      expect(printed).to include("Creating role: #{role_name} with trust relationship #{trust_relationship}")
+      expect(printed).to include("Created role: #{role_name} with trust relationship #{trust_relationship}")
 
     end
-=end
+
     it 'should not create role when trust relationship document cannot be loaded' do
       # Setup
       role_name = "testRole"
       trust_relationship_file = 'trustrelationshipfile'
 
-      target = AwsCfHelpers::Admin::IdentityAndAccess.new
-      aws_client = target.instance_variable_get(:@iamClient)
-      allow(aws_client).to receive(:create_role)
-
       # Act
-      expect{target.create_role(role_name,trust_relationship_file)}.to raise_error(message= "Trust Relationship file could not be loaded")
+      expect{AwsPocketknife::Iam.create_role(role_name,trust_relationship_file)}.to raise_error(message= "Trust Relationship file could not be loaded")
 
 
     end
@@ -201,21 +178,15 @@ describe AwsPocketknife::Iam do
       policy = 'policy'
 
       # Act
-      target = AwsCfHelpers::Admin::IdentityAndAccess.new
-      aws_client = target.instance_variable_get(:@iamClient)
-      allow(aws_client).to receive(:attach_role_policy)
-      allow(target).to receive(:get_policy_arn).and_return('123')
+      allow(AwsPocketknife::Iam).to receive(:get_policy_arn).and_return('123')
+
+      expect_any_instance_of(Aws::IAM::Client).to receive(:attach_role_policy).with({role_name:role,policy_arn:'123'})
 
       # Act
       printed = capture_stdout do
-        target.attach_policy_to_role(role,policy)
+        AwsPocketknife::Iam.attach_policy_to_role(role,policy)
       end
 
-      # Assert
-      expect(aws_client).to have_received(:attach_role_policy).with({role_name:role,policy_arn:'123'}).exactly(1).times
-      # Talk to Gustavo about commented code below:
-      #expect(printed).to include("Attach policy: #{policy}  to role: #{role}")
-      #expect(printed).to include("Attached policy: #{policy} to role: #{role}")
     end
 
     it 'should throw and exception when the arn number of the policy cannot be found'do
@@ -224,12 +195,8 @@ describe AwsPocketknife::Iam do
       policy = 'policy'
 
       # Act
-      target = AwsCfHelpers::Admin::IdentityAndAccess.new
-      aws_client = target.instance_variable_get(:@iamClient)
-      allow(aws_client).to receive(:attach_role_policy)
-      allow(target).to receive(:get_policy_arn).and_return(nil)
-
-      expect{target.attach_policy_to_role(role,policy)}.to raise_error(message="The policy #{policy} could not be found")
+      allow(AwsPocketknife::Iam).to receive(:get_policy_arn).and_return(nil)
+      expect{AwsPocketknife::Iam.attach_policy_to_role(role,policy)}.to raise_error(message="The policy #{policy} could not be found")
 
 
     end
@@ -239,18 +206,14 @@ describe AwsPocketknife::Iam do
     it 'should add an instance profile within aws with the supplied instance profile name'do
       instance_profile_name = 'instanceProfileName'
 
-      # Act
-      target = AwsCfHelpers::Admin::IdentityAndAccess.new
-      aws_client = target.instance_variable_get(:@iamClient)
-      allow(aws_client).to receive(:create_instance_profile)
+      expect_any_instance_of(Aws::IAM::Client).to receive(:create_instance_profile).with(instance_profile_name: instance_profile_name)
 
       # Act
       printed = capture_stdout do
-        target.create_instance_profile(instance_profile_name)
+        AwsPocketknife::Iam.create_instance_profile(instance_profile_name)
       end
 
       # Assert
-      expect(aws_client).to have_received(:create_instance_profile).with({instance_profile_name:instance_profile_name}).exactly(1).times
       expect(printed).to include("Creating instance profile: #{instance_profile_name}")
       expect(printed).to include("Created instance profile: #{instance_profile_name}")
 
@@ -262,18 +225,14 @@ describe AwsPocketknife::Iam do
       instance_profile_name = 'instanceProfileName'
       role_name = 'roleName'
 
-      # Act
-      target = AwsCfHelpers::Admin::IdentityAndAccess.new
-      aws_client = target.instance_variable_get(:@iamClient)
-      allow(aws_client).to receive(:add_role_to_instance_profile)
+      expect_any_instance_of(Aws::IAM::Client).to receive(:add_role_to_instance_profile).with(instance_profile_name: instance_profile_name, role_name: role_name)
 
       # Act
       printed = capture_stdout do
-        target.add_role_to_instance_profile(role_name,instance_profile_name)
+        AwsPocketknife::Iam.add_role_to_instance_profile(role_name, instance_profile_name)
       end
 
       # Assert
-      expect(aws_client).to have_received(:add_role_to_instance_profile).with({instance_profile_name:instance_profile_name,role_name: role_name}).exactly(1).times
       expect(printed).to include("Adding role #{role_name} to instance profile: #{instance_profile_name}")
       expect(printed).to include("Added role #{role_name} to instance profile: #{instance_profile_name}")
 
