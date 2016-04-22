@@ -11,9 +11,9 @@ namespace :iam do
     AwsPocketknife::Iam.create_group(args[:group_name])
   end
 
-  desc 'Create IAM Policy from file'
-  task :create_policy, [:policy_name,:policy_file,:s3bucket1,:s3bucket2]  do |_t, args|
-    AwsPocketknife::Iam.create_policy_from_policy_file(args[:policy_name],args[:policy_file],args[:s3bucket1],args[:s3bucket2])
+  desc 'Create IAM Policy from file. You pass list of s3 buckets like so: s1bucket;s2bucket'
+  task :create_policy, [:policy_name,:policy_file,:s3_buckets]  do |_t, args|
+    AwsPocketknife::Iam.create_policy_from_policy_file(policy_name: args[:policy_name], policy_file: args[:policy_file], s3_buckets: args[:s3_buckets])
   end
 
   desc 'Attach IAM Policy to Group'

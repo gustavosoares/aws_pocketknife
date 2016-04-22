@@ -42,44 +42,37 @@ describe AwsPocketknife::Iam do
     it 'Should create a policy within aws from a saved policy file' do
 
       policy_name = 'testUser'
-      s3bucket1 = 'bucket1'
-      s3bucket2 = 'bucket2'
+      s3_buckets = "bucket1;bucket2"
       policy_file = "devops.json"
-      io_read = '"Resource": [
-        "[%S3Bucket1%]",
-        "[%S3Bucket2%]"
-      ]'
+      io_read = '{
+      "Action": [
+        "s3:*"
+      ],
+      "Effect": "Allow",
+      "Resource": [
+        <% buckets.first(buckets.length-1).each do |bucket| %>
+          "<%= bucket %>",
+        <% end %>
+        "<%= buckets.reverse[0] %>"
+      ]
+    },'
       allow(IO).to receive(:read).with(File.join(policy_file)).and_return(io_read)
-      policy = IO.read(policy_file)
-      policy.gsub! '[%S3Bucket1%]', s3bucket1
-      policy.gsub! '[%S3Bucket2%]', s3bucket2
 
-      expect_any_instance_of(Aws::IAM::Client).to receive(:create_policy).with({policy_name:policy_name,policy_document:policy})
-      AwsPocketknife::Iam.create_policy_from_policy_file(policy_name,policy_file,s3bucket1,s3bucket2)
+      policy = '{
+      "Action": [
+        "s3:*"
+      ],
+      "Effect": "Allow",
+      "Resource": [
+          "bucket1",
+        "bucket2"
+      ]
+    },'
+      expect_any_instance_of(Aws::IAM::Client).to receive(:create_policy).with({policy_name:policy_name, policy_document:policy})
+      AwsPocketknife::Iam.create_policy_from_policy_file(policy_name: policy_name, policy_file: policy_file, s3_buckets: s3_buckets)
 
     end
 
-    it 'Should create a policy within aws from a saved policy file and replace values' do
-      # Setup
-
-      policy_name = 'testUser'
-      policy_file = "devops.json"
-      # aws_client = target.instance_variable_get(:@iamClient)
-      # allow(aws_client).to receive(:create_policy)
-      io_read = '"Resource": [
-        "[%S3Bucket1%]",
-        "[%S3Bucket2%]"
-      ]'
-      allow(IO).to receive(:read).with(File.join(policy_file)).and_return(io_read)
-
-      # Act
-      printed = capture_stdout do
-        AwsPocketknife::Iam.create_policy_from_policy_file(policy_name,policy_file,"bucket1","bucket2")
-      end
-      # Verify
-      expect(printed).to include('Replacing [%S3Bucket1%] with bucket1')
-      expect(printed).to include('Replacing [%S3Bucket2%] with bucket2')
-    end
   end
 
   describe "#attach_policy_to_group" do

@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rake", "~> 10.0"
   spec.add_dependency "rspec", "~> 3.4"
   spec.add_dependency "webmock", "= 1.24.2"
+  spec.add_dependency "erubis", "= 2.7.0"
 
   spec.add_development_dependency "bundler", "~> 1.11"
   spec.add_development_dependency "debase", "= 0.2.2.beta6"

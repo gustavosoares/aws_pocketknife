@@ -1,3 +1,4 @@
+require 'erubis'
 require 'aws_helpers'
 require 'aws_pocketknife'
 
@@ -26,23 +27,14 @@ module AwsPocketknife
         puts "Created policy: #{policy_name}"
       end
 
-      def create_policy_from_policy_file(policy_name,policy_file,s3_buckets_one,s3_buckets_two)
+      def create_policy_from_policy_file(policy_name: "", policy_file: "", s3_buckets: "")
         puts "Creating policy #{policy_name} from saved policy #{policy_file}"
         policy = IO.read(policy_file)
+        buckets = get_bucket_list(buckets_list: s3_buckets)
+        template = Erubis::Eruby.new(policy)
+        vars = {buckets: buckets}
 
-        unless s3_buckets_one.nil?
-          puts "Replacing [%S3Bucket1%] with #{s3_buckets_one}"
-          policy.gsub! '[%S3Bucket1%]', s3_buckets_one
-        else
-          policy.gsub! '[%S3Bucket1%]', ''
-        end
-
-        unless s3_buckets_two.nil?
-          puts "Replacing [%S3Bucket2%] with #{s3_buckets_two}"
-          policy.gsub! '[%S3Bucket2%]', "#{s3_buckets_two}"
-        else
-          policy.gsub! '[%S3Bucket2%]', ''
-        end
+        policy = template.result(vars)
 
         puts policy
 
@@ -118,6 +110,10 @@ module AwsPocketknife
 
 
       private
+
+      def get_bucket_list(buckets_list: "")
+        buckets_list.strip.split(";")
+      end
 
       def get_policy_arn(policy_name)
         response = @iamClient.list_policies({scope: 'Local'})
