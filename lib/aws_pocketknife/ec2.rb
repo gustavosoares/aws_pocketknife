@@ -11,6 +11,37 @@ module AwsPocketknife
     class << self
       include AwsPocketknife::Common::Utils
 
+      def create_image(instance_id: "",
+                       name: "",
+                       description: "",
+                       volume_type: "gp2",
+                       iops: 3,
+                       encrypted: false,
+                       volume_size: 60
+      )
+
+        resp = @ec2_client.create_image({
+                  dry_run: false,
+                  instance_id: instance_id, # required
+                  name: name, # required
+                  description: description,
+                  no_reboot: true,
+                  block_device_mappings: [
+                      {
+                          device_name: "/dev/sda1",
+                          ebs: {
+                              volume_size: volume_size,
+                              delete_on_termination: true,
+                              volume_type: volume_type, # accepts standard, io1, gp2, sc1, st1
+                              iops: iops,
+                              encrypted: encrypted,
+                          }
+                      },
+                  ],
+              })
+        resp.image_id
+      end
+
       def stop_instance_by_id(instance_ids)
         instance_id_list = get_instance_id_list(instance_ids: instance_ids)
         puts "Stoping instance id: #{instance_id_list}"
