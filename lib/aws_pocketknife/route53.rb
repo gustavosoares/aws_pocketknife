@@ -1,6 +1,7 @@
 require 'aws_pocketknife'
 require_relative "common/utils"
 
+
 module AwsPocketknife
   module Route53
 
@@ -21,7 +22,7 @@ module AwsPocketknife
         zone = find_hosted_zone_id(list: hosted_zones, name: hosted_zone)
 
         unless zone.nil?
-          puts "#{zone.name} | #{zone.id}"
+          nice_print(object: zone.to_h)
         else
           puts "#{hosted_zone} not found"
         end
