@@ -12,7 +12,11 @@ module AwsPocketknife
 
       def list_hosted_zones
         result = @client.list_hosted_zones
-        result.hosted_zones
+        unless result.nil?
+         return result.hosted_zones
+        else
+          return []
+        end
       end
 
 

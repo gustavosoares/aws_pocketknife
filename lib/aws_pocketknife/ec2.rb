@@ -9,6 +9,7 @@ module AwsPocketknife
     @ec2_client = AwsPocketknife.ec2_client
 
     class << self
+      include AwsPocketknife::Common::Utils
 
       def stop_instance_by_id(instance_ids)
         instance_id_list = get_instance_id_list(instance_ids: instance_ids)
