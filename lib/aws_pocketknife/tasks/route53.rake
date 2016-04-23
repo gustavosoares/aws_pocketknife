@@ -10,10 +10,12 @@ namespace :route53 do
   desc "listed hosted zones"
   task :list_hosted_zones do
     hosted_zones = AwsPocketknife::Route53.list_hosted_zones
-    headers = [ 'Name', 'Zone ID']
+    headers = [ 'Name', 'Zone ID', 'Comment']
     data = []
     hosted_zones.each do |h|
-      data << [h.name, AwsPocketknife::Route53.get_hosted_zone_id(hosted_zone: h.id)]
+      data << [h.name,
+               AwsPocketknife::Route53.get_hosted_zone_id(hosted_zone: h.id),
+               h.config.comment]
     end
     AwsPocketknife::Route53.pretty_table(headers: headers, data: data)
   end
