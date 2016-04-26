@@ -4,6 +4,7 @@ require "rspec/core/rake_task"
 load "lib/aws_pocketknife/tasks/route53.rake"
 load "lib/aws_pocketknife/tasks/ec2.rake"
 load "lib/aws_pocketknife/tasks/iam.rake"
+load "lib/aws_pocketknife/tasks/elastic_beanstalk.rake"
 
 RSpec::Core::RakeTask.new(:spec)
 
