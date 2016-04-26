@@ -15,33 +15,32 @@ namespace :elasticbeanstalk do
   desc "list environments"
   task :list_environments do
     environments = AwsPocketknife::ElasticBeanstalk.describe_environment
-    headers = [ 'App Name', 'cname', 'Env Name', 'Updated', 'Version', 'Health']
+    headers = [ 'App Name', 'Env Name', 'cname', 'Updated', 'Version', 'Health']
     data = []
     environments.each do |e|
-      data << [e.application_name, e.cname, e.environment_name, e.date_updated, e.version_label, e.health]
+      data << [e.application_name, e.environment_name, e.cname, e.date_updated, e.version_label, e.health]
     end
     AwsPocketknife::ElasticBeanstalk.pretty_table(headers: headers, data: data)
   end
 
-  #
-  # desc "list records for hosted zone"
-  # task :list_records, [:hosted_zone] do |t, args|
-  #   records = AwsPocketknife::Route53.list_records_for_zone_name(hosted_zone_name: args[:hosted_zone])
-  #   headers = ["Name", "Type", "DNS Name", "Target Hosted zone id"]
-  #   data = []
-  #   if records.length > 0
-  #     records.each do |record|
-  #       if record.alias_target.nil?
-  #         data << [record.name, record.type, nil, nil]
-  #       else
-  #         data << [record.name, record.type, record.alias_target.dns_name, record.alias_target.hosted_zone_id]
-  #       end
-  #     end
-  #     AwsPocketknife::Route53.pretty_table(headers: headers, data: data)
-  #   else
-  #     puts "No records found hosted zone #{args[:hosted_zone]}"
-  #   end
-  # end
+  desc "list environment variables for an environment"
+  task :list_environment_variables, [:environment_name] do |t, args|
+    variables = AwsPocketknife::ElasticBeanstalk.list_environment_variables(environment_name: args[:environment_name])
+    headers = [ 'Name', 'Value']
+    data = []
+    variables.each do |v|
+      v_temp = v.split("=")
+      name = v_temp[0]
+
+      # remove first element from array
+      v_temp.shift
+      value = v_temp.join
+      data << [name, value]
+    end
+    puts "Environment variables for environment: #{args[:environment_name]}"
+    AwsPocketknife::ElasticBeanstalk.pretty_table(headers: headers, data: data)
+  end
+
 
 end
 
