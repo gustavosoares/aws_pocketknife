@@ -28,8 +28,9 @@ module AwsPocketknife
         if environment_name.length == 0
           resp = @client.describe_environments({})
         else
+          environment_list = environment_name.split(";")
           resp = @client.describe_environments({
-              environment_name: environment_name,
+                                                   environment_names: environment_list,
           })
         end
 
@@ -45,7 +46,7 @@ module AwsPocketknife
         #get environment_variables
         resp = @client.describe_configuration_settings({
                application_name: app_name,
-               environment_name: environment,
+               environment_name: environment_name,
            })
 
         configuration_setting = resp.configuration_settings[0]

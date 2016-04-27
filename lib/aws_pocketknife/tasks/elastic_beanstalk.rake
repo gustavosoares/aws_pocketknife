@@ -37,7 +37,7 @@ namespace :elasticbeanstalk do
       value = v_temp.join
       data << [name, value]
     end
-    puts "Environment variables for environment: #{args[:environment_name]}"
+    puts "Environment: #{args[:environment_name]}"
     AwsPocketknife::ElasticBeanstalk.pretty_table(headers: headers, data: data)
   end
 
