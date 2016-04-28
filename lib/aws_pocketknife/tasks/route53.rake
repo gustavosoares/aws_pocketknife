@@ -28,14 +28,14 @@ namespace :route53 do
   desc "list records for hosted zone"
   task :list_records, [:hosted_zone] do |t, args|
     records = AwsPocketknife::Route53.list_records_for_zone_name(hosted_zone_name: args[:hosted_zone])
-    headers = ["Name", "Type", "DNS Name", "Target Hosted zone id"]
+    headers = ["Name", "Type", "DNS Name"]
     data = []
     if records.length > 0
       records.each do |record|
         if record.type == 'CNAME'
-          data << [record.name, record.type, record.resource_records[0].value, nil]
+          data << [record.name, record.type, record.resource_records[0].value]
         else
-          data << [record.name, record.type, record.alias_target.dns_name, record.alias_target.hosted_zone_id]
+          data << [record.name, record.type, record.alias_target.dns_name]
         end
       end
       AwsPocketknife::Route53.pretty_table(headers: headers, data: data)
