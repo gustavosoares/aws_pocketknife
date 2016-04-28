@@ -32,8 +32,8 @@ namespace :route53 do
     data = []
     if records.length > 0
       records.each do |record|
-        if record.alias_target.nil?
-          data << [record.name, record.type, nil, nil]
+        if record.type == 'CNAME'
+          data << [record.name, record.type, record.resource_records[0].value, nil]
         else
           data << [record.name, record.type, record.alias_target.dns_name, record.alias_target.hosted_zone_id]
         end
