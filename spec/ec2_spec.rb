@@ -11,11 +11,10 @@ describe '#stop_instance_by_id' do
 
     allow(AwsPocketknife::Ec2).to receive(:wait_till_instance_is_stopped).and_return("mock")
 
-    printed = capture_stdout do
-      AwsPocketknife::Ec2.stop_instance_by_id(instance_id)
-    end
+    expect_any_instance_of(Aws::EC2::Client).to receive(:stop_instances)
+                                                    .with({ instance_ids: ["1"] })
 
-    expect(printed).to include("Stoping instance id: [\"#{instance_id}\"]")
+    AwsPocketknife::Ec2.stop_instance_by_id(instance_id)
   end
 
   it 'should stop list of instances' do
@@ -24,11 +23,10 @@ describe '#stop_instance_by_id' do
 
     allow(AwsPocketknife::Ec2).to receive(:wait_till_instance_is_stopped).and_return("mock")
 
-    printed = capture_stdout do
-      AwsPocketknife::Ec2.stop_instance_by_id(instance_id)
-    end
+    expect_any_instance_of(Aws::EC2::Client).to receive(:stop_instances)
+                                                    .with({ instance_ids: ["1", "2", "3"] })
 
-    expect(printed).to include("Stoping instance id: [\"1\", \"2\", \"3\"]")
+    AwsPocketknife::Ec2.stop_instance_by_id(instance_id)
   end
 
 end
@@ -39,22 +37,19 @@ describe '#start_instance_by_id' do
 
     instance_id = "1"
 
-    printed = capture_stdout do
-      AwsPocketknife::Ec2.start_instance_by_id(instance_id)
-    end
+    expect_any_instance_of(Aws::EC2::Client).to receive(:start_instances)
+                                                    .with({ instance_ids: ["1"] })
+    AwsPocketknife::Ec2.start_instance_by_id(instance_id)
 
-    expect(printed).to include("Start instance id: [\"#{instance_id}\"]")
   end
 
   it 'should start list of instances' do
 
     instance_id = "1;2;3"
 
-    printed = capture_stdout do
-      AwsPocketknife::Ec2.start_instance_by_id(instance_id)
-    end
-
-    expect(printed).to include("Start instance id: [\"1\", \"2\", \"3\"]")
+    expect_any_instance_of(Aws::EC2::Client).to receive(:start_instances)
+                                                    .with({ instance_ids: ["1", "2", "3"] })
+    AwsPocketknife::Ec2.start_instance_by_id(instance_id)
   end
 
 end
