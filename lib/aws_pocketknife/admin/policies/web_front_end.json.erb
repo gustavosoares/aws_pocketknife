@@ -19,8 +19,10 @@
         "s3:GetObject"
       ],
       "Resource": [
-        "[%S3Bucket1%]/*",
-        "[%S3Bucket2%]/*"
+        <% buckets.first(buckets.length-1).each do |bucket| %>
+        "<%= bucket %>/*",
+        <% end %>
+        "<%= buckets.reverse[0] %>"
       ]
     },
     {
@@ -30,10 +32,11 @@
         "s3:ListBucket"
       ],
       "Resource": [
-        "[%S3Bucket1%]/logs",
-        "[%S3Bucket1%]/logs/*",
-        "[%S3Bucket2%]/logs",
-        "[%S3Bucket2%]/logs/*"
+        <% buckets.first(buckets.length-1).each do |bucket| %>
+        "<%= bucket %>/logs",
+        "<%= bucket %>/logs/*",
+        <% end %>
+        "<%= buckets.reverse[0] %>"
       ]
     },
     {
