@@ -53,3 +53,62 @@ describe '#start_instance_by_id' do
   end
 
 end
+
+describe '#describe_instances_by_name' do
+
+  it 'should describe instances by name' do
+
+    name = "test"
+
+    aws_response = RecursiveOpenStruct.new({reservations: [
+      {instances: []}
+    ]}, recurse_over_arrays: true)
+
+    expect_any_instance_of(Aws::EC2::Client).to receive(:describe_instances)
+                                                    .with({dry_run: false,
+                                                           filters: [
+                                                               {
+                                                                   name: "tag:Name",
+                                                                   values: [name]
+                                                               }
+                                                           ]})
+                                                    .and_return(aws_response)
+
+    instances = AwsPocketknife::Ec2.describe_instances_by_name(name: name)
+  end
+end
+
+describe '#describe_instance_by_id' do
+
+  it 'should return nil when instance id is not found' do
+    instance_id = "i-test"
+
+    aws_response = RecursiveOpenStruct.new({reservations: [
+        {instances: []}
+    ]}, recurse_over_arrays: true)
+
+    expect_any_instance_of(Aws::EC2::Client).to receive(:describe_instances)
+                                                    .with({dry_run: false, instance_ids: [instance_id]})
+                                                    .and_return(aws_response)
+
+    instance = AwsPocketknife::Ec2.describe_instance_by_id(instance_id: instance_id)
+    expect(instance).to eq(nil)
+  end
+
+  it 'should return instance' do
+    instance_id = "i-test"
+
+    aws_response = RecursiveOpenStruct.new({reservations: [
+        {instances: [{instance_id: instance_id}]}
+    ]}, recurse_over_arrays: true)
+
+    expect_any_instance_of(Aws::EC2::Client).to receive(:describe_instances)
+                                                    .with({dry_run: false, instance_ids: [instance_id]})
+                                                    .and_return(aws_response)
+
+    instance = AwsPocketknife::Ec2.describe_instance_by_id(instance_id: instance_id)
+    expect(instance).to_not eq(nil)
+    expect(instance.instance_id).to eq(instance_id)
+  end
+
+end
