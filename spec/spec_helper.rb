@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'aws_pocketknife'
 require 'webmock/rspec'
+require 'recursive-open-struct'
 
 def capture_stdout(&blk)
   old = $stdout

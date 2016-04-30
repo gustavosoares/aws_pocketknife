@@ -3,58 +3,115 @@ require 'spec_helper'
 
 require 'aws_pocketknife/ec2'
 
-describe '#stop_instance_by_id' do
+describe AwsPocketknife::Ec2 do
 
-  it 'should stop one instance' do
+  describe '#stop_instance_by_id' do
 
-    instance_id = "1"
+    it 'should stop one instance' do
 
-    allow(AwsPocketknife::Ec2).to receive(:wait_till_instance_is_stopped).and_return("mock")
+      instance_id = "1"
 
-    printed = capture_stdout do
+      allow(AwsPocketknife::Ec2).to receive(:wait_till_instance_is_stopped).and_return("mock")
+
+      expect_any_instance_of(Aws::EC2::Client).to receive(:stop_instances)
+                                                      .with({ instance_ids: ["1"] })
+
       AwsPocketknife::Ec2.stop_instance_by_id(instance_id)
     end
 
-    expect(printed).to include("Stoping instance id: [\"#{instance_id}\"]")
-  end
+    it 'should stop list of instances' do
 
-  it 'should stop list of instances' do
+      instance_id = "1;2;3"
 
-    instance_id = "1;2;3"
+      allow(AwsPocketknife::Ec2).to receive(:wait_till_instance_is_stopped).and_return("mock")
 
-    allow(AwsPocketknife::Ec2).to receive(:wait_till_instance_is_stopped).and_return("mock")
+      expect_any_instance_of(Aws::EC2::Client).to receive(:stop_instances)
+                                                      .with({ instance_ids: ["1", "2", "3"] })
 
-    printed = capture_stdout do
       AwsPocketknife::Ec2.stop_instance_by_id(instance_id)
     end
 
-    expect(printed).to include("Stoping instance id: [\"1\", \"2\", \"3\"]")
   end
 
-end
+  describe '#start_instance_by_id' do
 
-describe '#start_instance_by_id' do
+    it 'should start one instance' do
 
-  it 'should start one instance' do
+      instance_id = "1"
 
-    instance_id = "1"
+      expect_any_instance_of(Aws::EC2::Client).to receive(:start_instances)
+                                                      .with({ instance_ids: ["1"] })
+      AwsPocketknife::Ec2.start_instance_by_id(instance_id)
 
-    printed = capture_stdout do
+    end
+
+    it 'should start list of instances' do
+
+      instance_id = "1;2;3"
+
+      expect_any_instance_of(Aws::EC2::Client).to receive(:start_instances)
+                                                      .with({ instance_ids: ["1", "2", "3"] })
       AwsPocketknife::Ec2.start_instance_by_id(instance_id)
     end
 
-    expect(printed).to include("Start instance id: [\"#{instance_id}\"]")
   end
 
-  it 'should start list of instances' do
+  describe '#describe_instances_by_name' do
 
-    instance_id = "1;2;3"
+    it 'should describe instances by name' do
 
-    printed = capture_stdout do
-      AwsPocketknife::Ec2.start_instance_by_id(instance_id)
+      name = "test"
+
+      aws_response = RecursiveOpenStruct.new({reservations: [
+          {instances: []}
+      ]}, recurse_over_arrays: true)
+
+      expect_any_instance_of(Aws::EC2::Client).to receive(:describe_instances)
+                                                      .with({dry_run: false,
+                                                             filters: [
+                                                                 {
+                                                                     name: "tag:Name",
+                                                                     values: [name]
+                                                                 }
+                                                             ]})
+                                                      .and_return(aws_response)
+
+      instances = AwsPocketknife::Ec2.describe_instances_by_name(name: name)
+    end
+  end
+
+  describe '#describe_instance_by_id' do
+
+    it 'should return nil when instance id is not found' do
+      instance_id = "i-test"
+
+      aws_response = RecursiveOpenStruct.new({reservations: [
+          {instances: []}
+      ]}, recurse_over_arrays: true)
+
+      expect_any_instance_of(Aws::EC2::Client).to receive(:describe_instances)
+                                                      .with({dry_run: false, instance_ids: [instance_id]})
+                                                      .and_return(aws_response)
+
+      instance = AwsPocketknife::Ec2.describe_instance_by_id(instance_id: instance_id)
+      expect(instance).to eq(nil)
     end
 
-    expect(printed).to include("Start instance id: [\"1\", \"2\", \"3\"]")
-  end
+    it 'should return instance' do
+      instance_id = "i-test"
 
+      aws_response = RecursiveOpenStruct.new({reservations: [
+          {instances: [{instance_id: instance_id}]}
+      ]}, recurse_over_arrays: true)
+
+      expect_any_instance_of(Aws::EC2::Client).to receive(:describe_instances)
+                                                      .with({dry_run: false, instance_ids: [instance_id]})
+                                                      .and_return(aws_response)
+
+      instance = AwsPocketknife::Ec2.describe_instance_by_id(instance_id: instance_id)
+      expect(instance).to_not eq(nil)
+      expect(instance.instance_id).to eq(instance_id)
+    end
+
+  end
 end

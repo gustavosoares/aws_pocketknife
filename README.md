@@ -1,5 +1,12 @@
 # AwsPocketknife
 
+Rake tasks to make aws administration a little bit easier and quicker from the command line than using the aws console. 
+These rake tasks are also handy if you have multiple aws accounts to manage, since you can't have multiple tabs open for
+different accounts.
+
+The aws cli allows you to setup profiles for each account. (see http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles) 
+After creating the profiles, you just export the environment variable AWS_PROFILE to specify the account you wish to use.
+
 ## Setup local environment
 
 To run and/or test the gem locally you need to export the following environment variables

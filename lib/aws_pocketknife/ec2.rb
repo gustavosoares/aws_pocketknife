@@ -57,13 +57,31 @@ module AwsPocketknife
         resp = @ec2_client.start_instances({ instance_ids: instance_id_list })
       end
 
-      def describe_instance_by_id(instance_id)
-        puts "Getting ec2 instance #{instance_id}"
-        resp = @ec2_client.describe_instances({dry_run: false, instance_ids: [instance_id.to_s]})
-        if resp.nil? or resp.reservations.length == 0
-          raise "Could not describe ec2 instance #{instance_id}"
+      # http://serverfault.com/questions/560337/search-ec2-instance-by-its-name-from-aws-command-line-tool
+      def describe_instances_by_name(name: "")
+        instances = []
+        resp = @ec2_client.describe_instances({dry_run: false,
+                                              filters: [
+                                                  {
+                                                      name: "tag:Name",
+                                                      values: [name]
+                                                  }
+                                              ]})
+        resp.reservations.each do |reservation|
+          reservation.instances.each do |instance|
+            instances << instance
+          end
         end
-        resp.reservations.first.instances.first
+        instances
+      end
+
+      def describe_instance_by_id(instance_id: "")
+        resp = @ec2_client.describe_instances({dry_run: false, instance_ids: [instance_id.to_s]})
+        if resp.nil? or resp.reservations.length == 0 or resp.reservations[0].instances.length == 0
+          return nil
+        else
+          return resp.reservations.first.instances.first
+        end
       end
 
       def get_instance_status(instance_id)
