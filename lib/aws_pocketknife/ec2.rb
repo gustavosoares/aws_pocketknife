@@ -75,7 +75,7 @@ module AwsPocketknife
         instances
       end
 
-      def describe_instance_by_id(instance_id)
+      def describe_instance_by_id(instance_id: "")
         resp = @ec2_client.describe_instances({dry_run: false, instance_ids: [instance_id.to_s]})
         if resp.nil? or resp.reservations.length == 0 or resp.reservations[0].instances.length == 0
           return nil

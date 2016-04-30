@@ -14,7 +14,7 @@ namespace :ec2 do
 
   desc 'Describe instance by id'
   task :describe_instance_by_id, [:instance_id]  do |t, args|
-    instance = AwsPocketknife::Ec2.describe_instance_by_id(args[:instance_id])
+    instance = AwsPocketknife::Ec2.describe_instance_by_id(instance_id: args[:instance_id])
     if instance.nil?
       puts "Instance #{args[:instance_id]} not found"
     else
