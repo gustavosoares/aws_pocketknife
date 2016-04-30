@@ -76,12 +76,12 @@ module AwsPocketknife
       end
 
       def describe_instance_by_id(instance_id)
-        puts "Getting ec2 instance #{instance_id}"
         resp = @ec2_client.describe_instances({dry_run: false, instance_ids: [instance_id.to_s]})
-        if resp.nil? or resp.reservations.length == 0
-          raise "Could not describe ec2 instance #{instance_id}"
+        if resp.nil? or resp.reservations.length == 0 or resp.reservations[0].instances.length == 0
+          return nil
+        else
+          return resp.reservations.first.instances.first
         end
-        resp.reservations.first.instances.first
       end
 
       def get_instance_status(instance_id)
