@@ -40,4 +40,12 @@ namespace :ec2 do
     end
   end
 
+  desc 'Get windows password'
+  task :get_windows_password, [:instance_id]  do |t, args|
+    password = AwsPocketknife::Ec2.get_windows_password(instance_id: args[:instance_id])
+    headers = ["instance id", "password"]
+    data = [[args[:instance_id], password]]
+    AwsPocketknife::Ec2.pretty_table(headers: headers, data: data)
+  end
+
 end

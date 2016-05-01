@@ -1,4 +1,6 @@
 require 'aws_pocketknife'
+require 'base64'
+require 'openssl'
 require_relative "common/utils"
 
 module AwsPocketknife
@@ -84,30 +86,35 @@ module AwsPocketknife
         end
       end
 
-      def get_instance_status(instance_id)
-        puts "Getting ec2 instance status for instance id #{instance_id}"
+      def get_windows_password(instance_id: "")
 
-        resp = @ec2_client.describe_instance_status({
-                               dry_run: false,
-                               instance_ids: [instance_id.to_s],
-                               include_all_instances: true
-                           })
+        private_keyfile_dir = ENV["AWS_POCKETKNIFE_KEYFILE_DIR"] || ""
+        raise "Environment variable AWS_POCKETKNIFE_KEYFILE_DIR is not defined" if private_keyfile_dir.length == 0
 
-        if resp.instance_statuses.length == 0
-          raise "Could not get instance state information for ec2 instance #{instance_id}"
-        end
+        instance = describe_instance_by_id(instance_id: instance_id)
+        key_name = instance.key_name
+        private_keyfile = File.join(private_keyfile_dir, "#{key_name}.pem")
+        raise "File #{private_keyfile} not found" unless File.exist?(private_keyfile)
 
-        resp.instance_statuses.first
+        resp = @ec2_client.get_password_data({dry_run: false,
+                                              instance_id: instance_id})
+        encrypted_password = resp.password_data
+        decrypt_windows_password(encrypted_password, private_keyfile)
       end
 
       private
 
-      def get_instance_id_list(instance_ids: "")
-        instance_ids.strip.split(";")
+      # Decrypts an encrypted password using a provided RSA
+      # private key file (PEM-format).
+      def decrypt_windows_password(encrypted_password, private_keyfile)
+        encrypted_password_bytes = Base64.decode64(encrypted_password)
+        private_keydata = File.open(private_keyfile, "r").read
+        private_key = OpenSSL::PKey::RSA.new(private_keydata)
+        private_key.private_decrypt(encrypted_password_bytes)
       end
 
-      def get_instance_state(instance_id)
-        get_instance_status(instance_id).instance_state
+      def get_instance_id_list(instance_ids: "")
+        instance_ids.strip.split(";")
       end
 
       def wait_till_instance_is_stopped(instance_ids, max_attempts: 12, delay_seconds: 10)

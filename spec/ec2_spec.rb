@@ -114,4 +114,40 @@ describe AwsPocketknife::Ec2 do
     end
 
   end
+
+  describe '#get_windows_password' do
+
+    let (:instance_id) { "i-test" }
+
+    it 'should retrieve windows password with success' do
+      private_keyfile_dir = "dir"
+      key_name = "my_key"
+      encrypted_password = "sdjadaldl"
+      private_keyfile = "test"
+      
+      aws_response = RecursiveOpenStruct.new({password_data: encrypted_password}, recurse_over_arrays: true)
+
+
+      expect_any_instance_of(Aws::EC2::Client).to receive(:get_password_data)
+                                                      .with({dry_run: false, instance_id: instance_id})
+                                                      .and_return(aws_response)
+
+      allow(ENV).to receive(:[]).with("AWS_POCKETKNIFE_KEYFILE_DIR").and_return(private_keyfile_dir)
+      allow(AwsPocketknife::Ec2).to receive(:describe_instance_by_id)
+                                        .with(instance_id: instance_id)
+                                        .and_return(RecursiveOpenStruct.new({key_name: key_name},
+                                                                            recurse_over_arrays: true))
+      allow(File).to receive(:exist?)
+                         .with("test").and_return(true)
+      allow(File).to receive(:join)
+                         .with(private_keyfile_dir, "#{key_name}.pem").and_return(private_keyfile)
+      allow(AwsPocketknife::Ec2).to receive(:decrypt_windows_password)
+                                        .with(encrypted_password, private_keyfile)
+                                        .and_return("my_password")
+
+
+      password = AwsPocketknife::Ec2.get_windows_password(instance_id: instance_id)
+      expect(password).to eq("my_password")
+    end
+  end
 end
