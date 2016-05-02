@@ -21,8 +21,8 @@ module AwsPocketknife
       @elb_client ||= Aws::ElasticLoadBalancing::Client.new(get_client_options)
     end
 
-    def auto_scaling_client
-      @auto_scaling_client ||= Aws::AutoScaling::Client.new(get_client_options)
+    def asg_client
+      @asg_client ||= Aws::AutoScaling::Client.new(get_client_options)
     end
 
     def elastic_beanstalk_client
