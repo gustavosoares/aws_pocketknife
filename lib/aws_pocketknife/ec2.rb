@@ -1,6 +1,7 @@
 require 'aws_pocketknife'
 require 'base64'
 require 'openssl'
+require 'recursive-open-struct'
 require_relative "common/utils"
 
 module AwsPocketknife
@@ -99,7 +100,12 @@ module AwsPocketknife
         resp = @ec2_client.get_password_data({dry_run: false,
                                               instance_id: instance_id})
         encrypted_password = resp.password_data
-        decrypt_windows_password(encrypted_password, private_keyfile)
+        decrypted_password = decrypt_windows_password(encrypted_password, private_keyfile)
+
+        RecursiveOpenStruct.new({password: decrypted_password,
+                                instance_id: instance.instance_id,
+                                 private_ip_address: instance.private_ip_address,
+                                 public_ip_address: instance.public_ip_address}, recurse_over_arrays: true)
       end
 
       private

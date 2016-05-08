@@ -8,7 +8,12 @@ module AwsPocketknife
     @iamClient = AwsPocketknife.iam_client
 
     class << self
+      include AwsPocketknife::Common::Utils
 
+      def list_ssl_certificates
+        resp = @iamClient.list_server_certificates({})
+      end
+      
       def create_iam_user(username)
         puts "Creating iam user: #{username}"
         @iamClient.create_user({user_name: username})

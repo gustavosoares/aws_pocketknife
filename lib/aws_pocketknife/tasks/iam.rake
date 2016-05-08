@@ -1,6 +1,13 @@
 require_relative "../iam"
 
 namespace :iam do
+
+  desc 'List ssl certificates'
+  task :list_ssl_certificates do
+    certs = AwsPocketknife::Iam.list_ssl_certificates
+    AwsPocketknife::Iam.nice_print(object: certs.to_h)
+  end
+
   desc 'Create IAM User'
   task :create_user, [:username]  do |_t, args|
     AwsPocketknife::Iam.create_iam_user(args[:username])

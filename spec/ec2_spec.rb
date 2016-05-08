@@ -146,8 +146,8 @@ describe AwsPocketknife::Ec2 do
                                         .and_return("my_password")
 
 
-      password = AwsPocketknife::Ec2.get_windows_password(instance_id: instance_id)
-      expect(password).to eq("my_password")
+      instance = AwsPocketknife::Ec2.get_windows_password(instance_id: instance_id)
+      expect(instance.password).to eq("my_password")
     end
   end
 end
