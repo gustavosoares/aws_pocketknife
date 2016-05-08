@@ -12,8 +12,4 @@ describe AwsPocketknife do
     expect(AwsPocketknife::AWS_REGION).to eq("ap-southeast-2")
   end
 
-  it 'aws_profile should be nil by default' do
-    expect(AwsPocketknife::AWS_PROFILE).to eq(nil)
-  end
-
 end
