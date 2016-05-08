@@ -28,9 +28,6 @@ module AwsPocketknife
         resp = @asg_client.describe_auto_scaling_groups({
                                 max_records: max_records,
                             })
-        # resp.auto_scaling_groups.each do |asg|
-        #   asgs << asg
-        # end
         asgs << resp.auto_scaling_groups
         next_token = resp.next_token
         while true
