@@ -2,7 +2,7 @@ require_relative "../route53"
 
 namespace :route53 do
 
-  desc "describe hosted zone"
+  desc "Describe hosted zone"
   task :describe_hosted_zone, [:hosted_zone] do |t, args|
     hosted_zone = AwsPocketknife::Route53.describe_hosted_zone(hosted_zone: args[:hosted_zone])
     unless hosted_zone.nil?
@@ -12,7 +12,7 @@ namespace :route53 do
     end
   end
 
-  desc "listed hosted zones"
+  desc "Listed hosted zones"
   task :list_hosted_zones do
     hosted_zones = AwsPocketknife::Route53.list_hosted_zones
     headers = [ 'Name', 'Zone ID', 'Comment']
@@ -25,7 +25,7 @@ namespace :route53 do
     AwsPocketknife::Route53.pretty_table(headers: headers, data: data)
   end
 
-  desc "list records for hosted zone"
+  desc "List records for hosted zone"
   task :list_records, [:hosted_zone] do |t, args|
     records = AwsPocketknife::Route53.list_records_for_zone_name(hosted_zone_name: args[:hosted_zone])
     headers = ["Name", "Type", "DNS Name"]
@@ -41,6 +41,29 @@ namespace :route53 do
       AwsPocketknife::Route53.pretty_table(headers: headers, data: data)
     else
       puts "No records found hosted zone #{args[:hosted_zone]}"
+    end
+  end
+
+  desc "Get record for hosted zone. Record type accepts SOA, A, TXT, NS, CNAME, MX, PTR, SRV, SPF, AAAA"
+  task :get_record, [:hosted_zone, :record_name, :record_type] do |t, args|
+    record_type = args[:record_type] || 'A'
+    record_name = args[:record_name]
+    records = AwsPocketknife::Route53.get_record(hosted_zone_name: args[:hosted_zone],
+                                                record_name:record_name,
+                                                record_type: record_type)
+    headers = ["Name", "Type", "DNS Name"]
+    data = []
+    if records.length > 0
+      records.each do |record|
+        if record.type == 'CNAME'
+          data << [record.name, record.type, record.resource_records[0].value]
+        else
+          data << [record.name, record.type, record.alias_target.dns_name]
+        end
+      end
+      AwsPocketknife::Route53.pretty_table(headers: headers, data: data)
+    else
+      puts "Record #{record_name} not found in hosted zone #{args[:hosted_zone]}"
     end
   end
 
