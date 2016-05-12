@@ -24,15 +24,54 @@ module AwsPocketknife
         zone = find_hosted_zone_id(list: hosted_zones, name: hosted_zone)
       end
 
+      def update_record(hosted_zone_name: "", record_name: "", record_type: "A", new_dns_name:"")
+        record_before_change = get_record(hosted_zone_name: record_name,
+                                          record_name: record_name,
+                                          record_type: record_type)
+
+        if record_before_change.length == 0
+          return nil
+        end
+
+        record = record_before_change[0]
+        payload = {
+            hosted_zone_id: hosted_zone_name,
+            change_batch: {
+                changes: [
+                    {
+                        action: "UPSERT",
+                        resource_record_set: {
+                            name: record_name,
+                            type: record_type,
+                            set_identifier: record.set_identifier,
+                            resource_records: [
+                                {
+                                    value: "RData", # required
+                                },
+                            ],
+                            alias_target: {
+                                hosted_zone_id: "ResourceId", # required
+                                dns_name: new_dns_name, # required
+                                evaluate_target_health: false, # required
+                            },
+                        }
+                    }
+                ]
+            }
+
+        }
+
+        result = @client.change_resource_record_sets(payload)
+
+      end
+
       def get_record(hosted_zone_name: "", record_name: "", record_type: "")
-        record = nil
         record = list_records_for_zone_name(
             hosted_zone_name: hosted_zone_name,
             record_name:record_name,
             record_type: record_type)
 
         return record
-
       end
 
       def list_records_for_zone_name(hosted_zone_name: "", record_name: "", record_type: "")
