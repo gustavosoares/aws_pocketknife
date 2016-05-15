@@ -1,9 +1,9 @@
 require_relative "../elastic_beanstalk"
 
-namespace :elasticbeanstalk do
+namespace :eb do
 
   desc "describe_environment_resources"
-  task :describe_environment_resources, [:environment_name] do |t, args|
+  task :describe_environment, [:environment_name] do |t, args|
     environment = AwsPocketknife::ElasticBeanstalk.describe_environment_resources(environment_name: args[:environment_name])
     unless environment.nil?
       AwsPocketknife::ElasticBeanstalk.nice_print(object: environment.to_h)
