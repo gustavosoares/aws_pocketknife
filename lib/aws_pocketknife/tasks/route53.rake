@@ -35,7 +35,11 @@ namespace :route53 do
         if record.type == 'CNAME'
           data << [record.name, record.type, record.resource_records[0].value]
         else
-          data << [record.name, record.type, record.alias_target.dns_name]
+          if record.alias_target.nil?
+            data << [record.name, record.type, "N/A"]
+          else
+            data << [record.name, record.type, record.alias_target.dns_name]
+          end
         end
       end
       AwsPocketknife::Route53.pretty_table(headers: headers, data: data)
