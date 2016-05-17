@@ -63,7 +63,13 @@ module AwsPocketknife
           return nil
         end
 
+        origin_record = origin_record[0]
         destiny_record = destiny_record[0]
+        if destiny_record.alias_target.dns_name == origin_record.alias_target.dns_name
+          puts "Origin and destiny alias_target.dns_name are the same: #{destiny_record.alias_target.dns_name} Aborting..."
+          return nil
+        end
+
         payload = {
             hosted_zone_id: hosted_zone_id,
             change_batch: {
