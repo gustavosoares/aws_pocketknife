@@ -24,36 +24,61 @@ module AwsPocketknife
         zone = find_hosted_zone_id(list: hosted_zones, name: hosted_zone)
       end
 
-      def update_record(hosted_zone_name: "", record_name: "", record_type: "A", new_dns_name:"")
-        record_before_change = get_record(hosted_zone_name: record_name,
-                                          record_name: record_name,
+      def update_record(origin_hosted_zone: "",
+                        origin_dns_name: "",
+                        record_type: "A",
+                        destiny_dns_name:"",
+                        destiny_hosted_zone: ""
+      )
+
+        comment = "Updating #{origin_dns_name} at #{origin_hosted_zone} to #{destiny_dns_name} at #{destiny_hosted_zone} with record type #{record_type}"
+        puts comment
+
+        # get hosted zone
+        hosted_zone = describe_hosted_zone(hosted_zone: origin_hosted_zone)
+        hosted_zone_id = get_hosted_zone_id(hosted_zone: hosted_zone.id)
+
+        # get origin record
+        origin_record = get_record(hosted_zone_name: origin_hosted_zone,
+                                          record_name: origin_dns_name,
                                           record_type: record_type)
 
-        if record_before_change.length == 0
+        # get record for new dns name
+        destiny_record = get_record(hosted_zone_name: destiny_hosted_zone,
+                                record_name: destiny_dns_name,
+                                record_type: record_type)
+
+        if origin_record.length == 0
+          puts "Could not find record for #{origin_dns_name} at #{origin_hosted_zone}"
           return nil
         end
 
-        record = record_before_change[0]
+        if destiny_record.length == 0
+          puts "Could not find record for #{destiny_dns_name} at #{destiny_hosted_zone}"
+          return nil
+        end
+
+        if destiny_record[0].alias_target.nil?
+          puts "DNS #{destiny_dns_name} is invalid"
+          return nil
+        end
+
+        destiny_record = destiny_record[0]
         payload = {
-            hosted_zone_id: hosted_zone_name,
+            hosted_zone_id: hosted_zone_id,
             change_batch: {
+                comment: comment,
                 changes: [
                     {
                         action: "UPSERT",
                         resource_record_set: {
-                            name: record_name,
+                            name: origin_dns_name,
                             type: record_type,
-                            set_identifier: record.set_identifier,
-                            resource_records: [
-                                {
-                                    value: "RData", # required
-                                },
-                            ],
                             alias_target: {
-                                hosted_zone_id: "ResourceId", # required
-                                dns_name: new_dns_name, # required
+                                hosted_zone_id: destiny_record.alias_target.hosted_zone_id, # required
+                                dns_name: destiny_record.alias_target.dns_name, # required
                                 evaluate_target_health: false, # required
-                            },
+                            }
                         }
                     }
                 ]
@@ -61,6 +86,7 @@ module AwsPocketknife
 
         }
 
+        nice_print(object: payload)
         result = @client.change_resource_record_sets(payload)
 
       end

@@ -71,5 +71,22 @@ namespace :route53 do
     end
   end
 
+  desc "Update dns record from existing dns entry."
+  task :update_record, [:hosted_zone, :record_name, :destiny_record_name, :destiny_hosted_zone, :record_type] do |t, args|
+    record_type = args[:record_type] || 'A'
+    origin_dns_name = args[:record_name]
+    destiny_record_name = args[:destiny_record_name]
+    hosted_zone = args[:hosted_zone]
+    destiny_hosted_zone = args[:destiny_hosted_zone]
+    AwsPocketknife::Route53.update_record(origin_hosted_zone: hosted_zone,
+                                          origin_dns_name: origin_dns_name,
+                                          record_type: record_type,
+                                          destiny_dns_name: destiny_record_name,
+                                          destiny_hosted_zone: destiny_hosted_zone
+    )
+
+  end
+
+
 end
 
