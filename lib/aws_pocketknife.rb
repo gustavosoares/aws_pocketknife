@@ -9,6 +9,10 @@ module AwsPocketknife
 
   class << self
 
+    def cloudwatch_logs_client
+      @cloudwatch_logs_client ||= Aws::CloudWatchLogs::Client.new(get_client_options)
+    end
+
     def cf_client
       @cloud_formation_client ||= Aws::CloudFormation::Client.new(get_client_options)
     end
