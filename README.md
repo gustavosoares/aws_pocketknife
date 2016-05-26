@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/MYOB-Technology/aws_pocketknife.svg?branch=master)]
+
 # AwsPocketknife
 
 Rake tasks to make aws administration a little bit easier and quicker from the command line than using the aws console. 
