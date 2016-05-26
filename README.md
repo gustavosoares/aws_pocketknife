@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/MYOB-Technology/aws_pocketknife.svg?branch=master)]
+![Build Status](https://travis-ci.org/MYOB-Technology/aws_pocketknife.svg?branch=master)
 
 # AwsPocketknife
 
