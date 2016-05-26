@@ -54,18 +54,25 @@ module AwsPocketknife
         end
 
         if destiny_record.length == 0
-          puts "Could not find record for #{destiny_dns_name} at #{destiny_hosted_zone}"
-          return nil
-        end
+          puts "Could not find destiny record for #{destiny_dns_name} at #{destiny_hosted_zone}"
+          puts "Updating #{origin_dns_name} with #{destiny_dns_name} at #{hosted_zone_id}"
+          destiny_hosted_zone_id = hosted_zone_id
+          new_dns_name = destiny_dns_name
+        else
 
-        if destiny_record[0].alias_target.nil?
-          puts "DNS #{destiny_dns_name} is invalid"
-          return nil
+          if destiny_record[0].alias_target.nil?
+            puts "DNS #{destiny_dns_name} is invalid"
+            return nil
+          end
+
+          destiny_hosted_zone_id = destiny_record[0].alias_target.hosted_zone_id
+          new_dns_name = destiny_record[0].alias_target.dns_name
         end
 
         origin_record = origin_record[0]
         destiny_record = destiny_record[0]
-        if destiny_record.alias_target.dns_name == origin_record.alias_target.dns_name
+
+        if not origin_record.alias_target.nil? and new_dns_name == origin_record.alias_target.dns_name
           puts "Origin and destiny alias_target.dns_name are the same: #{destiny_record.alias_target.dns_name} Aborting..."
           return nil
         end
@@ -81,8 +88,8 @@ module AwsPocketknife
                             name: origin_dns_name,
                             type: record_type,
                             alias_target: {
-                                hosted_zone_id: destiny_record.alias_target.hosted_zone_id, # required
-                                dns_name: destiny_record.alias_target.dns_name, # required
+                                hosted_zone_id: destiny_hosted_zone_id, # required
+                                dns_name: new_dns_name, # required
                                 evaluate_target_health: false, # required
                             }
                         }
