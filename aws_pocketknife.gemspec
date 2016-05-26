@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["gustavosoares@gmail.com"]
 
   spec.summary       = "Gem to expose some AWS api calls in rake tasks."
-  spec.description   = "Gem to expose some AWS api calls in rake tasks and also to facilitate the work to manage multiple aws accounts."
+  spec.description   = "Gem to expose some AWS api calls in rake tasks and also to ease the work when managing multiple aws accounts, since one browser can only hold session for one account."
   spec.homepage      = "https://github.com/MYOB-Technology/aws_pocketknife"
   spec.license       = "MIT"
 

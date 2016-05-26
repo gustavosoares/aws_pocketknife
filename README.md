@@ -1,10 +1,10 @@
 ![Build Status](https://travis-ci.org/MYOB-Technology/aws_pocketknife.svg?branch=master)
 
-# AwsPocketknife
+# Aws Pocketknife
 
 Rake tasks to make aws administration a little bit easier and quicker from the command line than using the aws console. 
 These rake tasks are also handy if you have multiple aws accounts to manage, since you can't have multiple tabs open for
-different accounts.
+different accounts. The only way would be to use diffente browsers or open incognito windows.
 
 The aws cli allows you to setup profiles for each account. (see http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles) 
 After creating the profiles, you just export the environment variable AWS_PROFILE to specify the account you wish to use.
@@ -62,13 +62,12 @@ Or install it yourself as:
 Type bundle exec rake -vT to see the list of available tasks
 
 
-
 ## Development
 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/aws_pocketknife. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/MYOB-Technology/aws_pocketknife. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 
 ## License
