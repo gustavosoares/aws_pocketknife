@@ -85,9 +85,9 @@ describe AwsPocketknife::Ec2 do
     it 'should return nil when instance id is not found' do
       instance_id = "i-test"
 
-      aws_response = RecursiveOpenStruct.new({reservations: [
+      aws_response = get_aws_response({reservations: [
           {instances: []}
-      ]}, recurse_over_arrays: true)
+      ]})
 
       expect_any_instance_of(Aws::EC2::Client).to receive(:describe_instances)
                                                       .with({dry_run: false, instance_ids: [instance_id]})
