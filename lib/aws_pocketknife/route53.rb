@@ -43,65 +43,82 @@ module AwsPocketknife
                                           record_name: origin_dns_name,
                                           record_type: record_type)
 
-        # get record for new dns name
-        destiny_record = get_record(hosted_zone_name: destiny_hosted_zone,
-                                record_name: destiny_dns_name,
-                                record_type: record_type)
-
         if origin_record.length == 0
           puts "Could not find record for #{origin_dns_name} at #{origin_hosted_zone}"
           return nil
         end
 
-        if destiny_record.length == 0
-          puts "Could not find destiny record for #{destiny_dns_name} at #{destiny_hosted_zone}"
-          puts "Updating #{origin_dns_name} with #{destiny_dns_name} at #{hosted_zone_id}"
-          destiny_hosted_zone_id = hosted_zone_id
-          new_dns_name = destiny_dns_name
-        else
+        if destiny_hosted_zone.length != 0
+          # get record for new dns name
+          destiny_record = get_record(hosted_zone_name: destiny_hosted_zone,
+                                      record_name: destiny_dns_name,
+                                      record_type: record_type)
 
-          if destiny_record[0].alias_target.nil?
-            puts "DNS #{destiny_dns_name} is invalid"
+          if destiny_record.length == 0
+            puts "Could not find destiny record for #{destiny_dns_name} at #{destiny_hosted_zone}"
             return nil
+          else
+
+            if destiny_record[0].alias_target.nil?
+              puts "DNS #{destiny_dns_name} is invalid"
+              return nil
+            end
+
+            destiny_hosted_zone_id = destiny_record[0].alias_target.hosted_zone_id
+            new_dns_name = destiny_record[0].alias_target.dns_name
           end
 
-          destiny_hosted_zone_id = destiny_record[0].alias_target.hosted_zone_id
-          new_dns_name = destiny_record[0].alias_target.dns_name
+          destiny_record = destiny_record[0]
+        else
+          new_dns_name = destiny_dns_name
         end
 
         origin_record = origin_record[0]
-        destiny_record = destiny_record[0]
 
         if not origin_record.alias_target.nil? and new_dns_name == origin_record.alias_target.dns_name
-          puts "Origin and destiny alias_target.dns_name are the same: #{destiny_record.alias_target.dns_name} Aborting..."
-          return nil
+          puts "Origin and destiny alias_target.dns_name are the same: #{new_dns_name} Aborting..."
+          return false
+        elsif origin_record.resource_records.length != 0 and new_dns_name == origin_record.resource_records[0].value
+          puts "Origin and destiny alias_target.dns_name are the same: #{new_dns_name} Aborting..."
+          return false
+        end
+
+        if destiny_hosted_zone.length != 0
+          change = {
+              action: "UPSERT",
+              resource_record_set: {
+                  name: origin_dns_name,
+                  type: record_type,
+                  alias_target: {
+                      hosted_zone_id: destiny_hosted_zone_id, # required
+                      dns_name: new_dns_name, # required
+                      evaluate_target_health: false, # required
+                  }
+              }
+          }
+        else
+          change = {
+              action: "UPSERT",
+              resource_record_set: {
+                  name: origin_dns_name,
+                  type: record_type,
+                  ttl: 300,
+                  resource_records: [{value: new_dns_name}]
+              }
+          }
         end
 
         payload = {
             hosted_zone_id: hosted_zone_id,
             change_batch: {
                 comment: comment,
-                changes: [
-                    {
-                        action: "UPSERT",
-                        resource_record_set: {
-                            name: origin_dns_name,
-                            type: record_type,
-                            alias_target: {
-                                hosted_zone_id: destiny_hosted_zone_id, # required
-                                dns_name: new_dns_name, # required
-                                evaluate_target_health: false, # required
-                            }
-                        }
-                    }
-                ]
+                changes: [change]
             }
 
         }
 
         nice_print(object: payload)
         result = @client.change_resource_record_sets(payload)
-
       end
 
       def get_record(hosted_zone_name: "", record_name: "", record_type: "")
