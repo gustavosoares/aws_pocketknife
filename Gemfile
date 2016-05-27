@@ -4,4 +4,4 @@ source 'https://rubygems.org'
 gemspec
 
 # Specify your gem's dependencies in aws_cf_helpers.gemspec
-gem "aws_helpers", :git => 'git@github.com:MYOB-Technology/aws_helpers.git', branch: 'backoff'
+gem "aws_helpers", :git => 'https://github.com/MYOB-Technology/aws_helpers.git', branch: 'backoff'

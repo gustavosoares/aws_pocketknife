@@ -14,8 +14,8 @@ module AwsPocketknife
 
       def create_log_group(log_group_name: "")
 
-        if logroup_name.length != 0
-          resp = client.create_log_group({
+        if log_group_name.length != 0
+          resp = @cloudwatch_logs_client.create_log_group({
                log_group_name: log_group_name, # required
            })
         end
