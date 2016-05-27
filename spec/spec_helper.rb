@@ -12,6 +12,10 @@ ensure
   $stdout = old
 end
 
+def get_aws_response(object)
+  RecursiveOpenStruct.new(object, recurse_over_arrays: true)
+end
+
 def capture_stderr(&blk)
   old = $stderr
   $stderr = fake = StringIO.new
