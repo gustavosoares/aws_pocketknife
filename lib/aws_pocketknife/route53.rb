@@ -122,10 +122,15 @@ module AwsPocketknife
       end
 
       def get_record(hosted_zone_name: "", record_name: "", record_type: "")
-        record = list_records_for_zone_name(
+        record = []
+        records = list_records_for_zone_name(
             hosted_zone_name: hosted_zone_name,
             record_name:record_name,
             record_type: record_type)
+
+        records.each do |r|
+          return [r] if r.name == record_name
+        end
 
         return record
       end
