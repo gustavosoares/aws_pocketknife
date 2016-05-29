@@ -19,6 +19,74 @@ describe AwsPocketknife::Route53 do
     end
   end
 
+  describe '#get_record' do
+
+    it 'should return find record and return its object' do
+
+      hosted_zone_name = "test"
+      hosted_zone_id = "ABC"
+      record_name = "example2.com"
+      record_type = "A"
+
+      aws_hosted_zone_response = get_aws_response({id: hosted_zone_id})
+      aws_records_response = get_aws_response({resource_record_sets: [
+          {name: "example1.com", type: "A"},
+          {name: "example2.com", type: "A"},
+      ]})
+
+      allow(AwsPocketknife::Route53).to receive(:describe_hosted_zone).and_return(aws_hosted_zone_response)
+
+      allow(AwsPocketknife::Route53).to receive(:get_hosted_zone_id)
+                                            .with(hosted_zone: hosted_zone_id).and_return(hosted_zone_id)
+
+      allow_any_instance_of(Aws::Route53::Client).to receive(:list_resource_record_sets)
+                                                         .with({hosted_zone_id: hosted_zone_id,
+                                                                start_record_name: record_name,
+                                                                start_record_type: record_type,
+                                                                max_items: 1,
+                                                               })
+                                                         .and_return(aws_records_response)
+
+      record = AwsPocketknife::Route53.get_record(hosted_zone_name: hosted_zone_name, record_name: record_name, record_type: record_type)
+      expect(record.length).to eq(1)
+      expect(record[0].name).to eq(record_name)
+
+    end
+
+    it 'should return empty array when record is not found' do
+
+      hosted_zone_name = "test"
+      hosted_zone_id = "ABC"
+      record_name = "example3.com"
+      record_type = "A"
+
+      aws_hosted_zone_response = get_aws_response({id: hosted_zone_id})
+      aws_records_response = get_aws_response({resource_record_sets: [
+          {name: "example1.com", type: "A"},
+          {name: "example2.com", type: "A"},
+      ]})
+
+      allow(AwsPocketknife::Route53).to receive(:describe_hosted_zone).and_return(aws_hosted_zone_response)
+
+      allow(AwsPocketknife::Route53).to receive(:get_hosted_zone_id)
+                                            .with(hosted_zone: hosted_zone_id).and_return(hosted_zone_id)
+
+      allow_any_instance_of(Aws::Route53::Client).to receive(:list_resource_record_sets)
+                                                         .with({hosted_zone_id: hosted_zone_id,
+                                                                start_record_name: record_name,
+                                                                start_record_type: record_type,
+                                                                max_items: 1,
+                                                               })
+                                                         .and_return(aws_records_response)
+
+      record = AwsPocketknife::Route53.get_record(hosted_zone_name: hosted_zone_name, record_name: record_name, record_type: record_type)
+      expect(record.length).to eq(0)
+      expect(record).to eq([])
+
+    end
+
+  end
+
   describe '#list_records_for_zone_name' do
     it 'should return an empty []' do
       allow(AwsPocketknife::Route53).to receive(:describe_hosted_zone).and_return(nil)
