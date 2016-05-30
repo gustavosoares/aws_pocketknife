@@ -5,6 +5,7 @@ load "lib/aws_pocketknife/tasks/route53.rake"
 load "lib/aws_pocketknife/tasks/ec2.rake"
 load "lib/aws_pocketknife/tasks/iam.rake"
 load "lib/aws_pocketknife/tasks/asg.rake"
+load "lib/aws_pocketknife/tasks/elb.rake"
 load "lib/aws_pocketknife/tasks/elastic_beanstalk.rake"
 load "lib/aws_pocketknife/tasks/cloudwatch.rake"
 
