@@ -2,6 +2,11 @@ require_relative '../ec2'
 
 namespace :ec2 do
 
+  desc 'share ami'
+  task :share_ami, [:image_id, :user_id]  do |t, args|
+    AwsPocketknife::Ec2.share_ami(image_id: args[:instance_id], user_id: args[:instance_id])
+  end
+
   desc 'Stop instance by id'
   task :stop_by_id, [:instance_id]  do |t, args|
     AwsPocketknife::Ec2.stop_instance_by_id(args[:instance_id])
