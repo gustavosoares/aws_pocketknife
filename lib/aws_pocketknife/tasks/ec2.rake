@@ -45,6 +45,11 @@ namespace :ec2 do
     end
   end
 
+  desc 'Find instances by name'
+  task :find_instances_by_name, [:name]  do |t, args|
+    Rake::Task["ec2:describe_instance_by_name"].invoke(args[:name])
+  end
+
   desc 'Get windows password'
   task :get_windows_password, [:instance_id]  do |t, args|
     instance = AwsPocketknife::Ec2.get_windows_password(instance_id: args[:instance_id])
