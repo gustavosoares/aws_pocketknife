@@ -191,11 +191,16 @@ module AwsPocketknife
         new_dns_name = destiny_record[0].alias_target.dns_name
         origin_record = origin_record[0]
 
+        unless new_dns_name.start_with?("dualstack.")
+          puts "Adding dualstack. to #{new_dns_name}"
+          new_dns_name = "dualstack." + new_dns_name
+        end
+
         if not origin_record.alias_target.nil? and new_dns_name == origin_record.alias_target.dns_name
-          puts "Origin and destiny alias_target.dns_name are the same: #{new_dns_name} Aborting..."
+          puts "Origin dns and destiny alias_target.dns_name points to the same record: #{new_dns_name}\nAborting..."
           return false
         elsif origin_record.resource_records.length != 0 and new_dns_name == origin_record.resource_records[0].value
-          puts "Origin and destiny alias_target.dns_name are the same: #{new_dns_name} Aborting..."
+          puts "Origin dns and destiny alias_target.dns_name points to the same record: #{new_dns_name}\nAborting..."
           return false
         end
 

@@ -173,7 +173,7 @@ describe AwsPocketknife::Route53 do
               type: record_type,
               alias_target: {
                   hosted_zone_id: destiny_hosted_zone_id, # required
-                  dns_name: destiny_dns_name, # required
+                  dns_name: "dualstack." + destiny_dns_name, # required
                   evaluate_target_health: false, # required
               }
           }
