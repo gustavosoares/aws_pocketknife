@@ -15,6 +15,21 @@ module AwsPocketknife
     class << self
       include AwsPocketknife::Common::Utils
 
+      def share_ami(image_id: "", user_id: "", options: {})
+        begin
+          options = {}
+          options[:image_id] = image_id
+          options[:launch_permission] = create_launch_permission(user_id)
+          puts "Sharing Image #{image_id} with #{user_id} with options #{options}"
+          response = @ec2_client.modify_image_attribute(options=options)
+          return response
+        rescue Exception => e
+          puts "## Got an error when sharing the image... #{e.cause} -> #{e.message}"
+          raise
+        end
+      end
+
+
       def create_image(instance_id: "",
                        name: "",
                        description: "",
@@ -109,6 +124,16 @@ module AwsPocketknife
       end
 
       private
+
+      def create_launch_permission(user_id)
+        {
+            add: [
+                {
+                    user_id: user_id
+                },
+            ]
+        }
+      end
 
       # Decrypts an encrypted password using a provided RSA
       # private key file (PEM-format).

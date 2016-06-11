@@ -162,7 +162,7 @@ describe AwsPocketknife::Route53 do
       destiny_dns_name ="example2.com"
       destiny_hosted_zone = "ABCD"
 
-      comment = "Updating #{origin_dns_name} at #{origin_hosted_zone} to #{destiny_dns_name} at #{destiny_hosted_zone} with record type #{record_type}"
+      comment = ""
       hosted_zone_id = "id"
       destiny_hosted_zone_id = "id"
 
@@ -231,7 +231,7 @@ describe AwsPocketknife::Route53 do
       destiny_dns_name ="example.com"
       destiny_hosted_zone = "ABCD"
 
-      comment = "Updating #{origin_dns_name} at #{origin_hosted_zone} to #{destiny_dns_name} at #{destiny_hosted_zone} with record type #{record_type}"
+      comment = ""
       hosted_zone_id = "id"
       destiny_hosted_zone_id = "id"
 
@@ -296,11 +296,11 @@ describe AwsPocketknife::Route53 do
 
       origin_hosted_zone = "ABC"
       origin_dns_name = "example.com"
-      record_type = "A"
+      record_type = "CNAME"
       destiny_dns_name ="example2.com"
       destiny_hosted_zone = ""
 
-      comment = "Updating #{origin_dns_name} at #{origin_hosted_zone} to #{destiny_dns_name} at #{destiny_hosted_zone} with record type #{record_type}"
+      comment = ""
       hosted_zone_id = "id"
 
       change = {
@@ -354,11 +354,11 @@ describe AwsPocketknife::Route53 do
 
       origin_hosted_zone = "ABC"
       origin_dns_name = "example.com"
-      record_type = "A"
+      record_type = "CNAME"
       destiny_dns_name ="example.com"
       destiny_hosted_zone = ""
 
-      comment = "Updating #{origin_dns_name} at #{origin_hosted_zone} to #{destiny_dns_name} at #{destiny_hosted_zone} with record type #{record_type}"
+      comment = ""
       hosted_zone_id = "id"
 
       change = {
@@ -401,10 +401,10 @@ describe AwsPocketknife::Route53 do
       expect_any_instance_of(Aws::Route53::Client).not_to receive(:change_resource_record_sets).with(payload)
 
       result = AwsPocketknife::Route53.update_record(origin_hosted_zone: origin_hosted_zone,
-                                            origin_dns_name: origin_dns_name,
-                                            record_type: record_type,
-                                            destiny_dns_name: destiny_dns_name,
-                                            destiny_hosted_zone: destiny_hosted_zone
+                                                     origin_dns_name: origin_dns_name,
+                                                     record_type: record_type,
+                                                     destiny_dns_name: destiny_dns_name,
+                                                     destiny_hosted_zone: destiny_hosted_zone
       )
 
       expect(result).to eq(false)

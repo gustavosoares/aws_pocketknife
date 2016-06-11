@@ -2,6 +2,11 @@ require_relative '../ec2'
 
 namespace :ec2 do
 
+  desc 'share ami'
+  task :share_ami, [:image_id, :user_id]  do |t, args|
+    AwsPocketknife::Ec2.share_ami(image_id: args[:instance_id], user_id: args[:instance_id])
+  end
+
   desc 'Stop instance by id'
   task :stop_by_id, [:instance_id]  do |t, args|
     AwsPocketknife::Ec2.stop_instance_by_id(args[:instance_id])
@@ -38,6 +43,11 @@ namespace :ec2 do
     else
       puts "No instance(s) found for name #{args[:name]}"
     end
+  end
+
+  desc 'Find instances by name'
+  task :find_instances_by_name, [:name]  do |t, args|
+    Rake::Task["ec2:describe_instance_by_name"].invoke(args[:name])
   end
 
   desc 'Get windows password'
