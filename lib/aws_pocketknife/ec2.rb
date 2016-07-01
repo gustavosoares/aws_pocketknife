@@ -47,7 +47,7 @@ module AwsPocketknife
           image = instance.create_image(name, :description => description)
           sleep 2 until image.exists?
           @log.info "image #{image.id} state: #{image.state}"
-          sleep 5 until image.state != :pending
+          sleep 10 until image.state != :pending
           if image.state == :failed
             raise "Create image failed"
           end
