@@ -19,10 +19,11 @@
       "Action": [
         "cloudwatch:PutMetricData",
         "logs:CreateLogGroup",
+        "logs:DeleteLogGroup",
         "logs:CreateLogStream",
         "logs:DescribeLogGroups",
         "logs:DescribeLogStreams",
-	"logs:PutRetentionPolicy",
+        "logs:PutRetentionPolicy",
         "logs:PutLogEvents"
       ],
       "Resource": "*"
@@ -30,11 +31,17 @@
     {
       "Action": [
         "iam:GetRole",
+        "iam:GetUser",
         "iam:ListRoles",
-        "iam:ListUsers",
         "iam:AddRoleToInstanceProfile",
         "iam:ListAttachedRolePolicies",
         "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:CreateInstanceProfile",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:RemoveRoleFromInstanceProfile",
+        "iam:DeleteInstanceProfile",
         "iam:PassRole"
       ],
       "Effect": "Allow",
