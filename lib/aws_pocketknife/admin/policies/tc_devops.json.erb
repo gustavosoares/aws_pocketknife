@@ -15,12 +15,25 @@
       "Resource": "*"
     },
     {
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:PutMetricData",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    },
+    {
       "Action": [
         "iam:GetRole",
         "iam:ListRoles",
         "iam:ListUsers",
         "iam:AddRoleToInstanceProfile",
         "iam:ListAttachedRolePolicies",
+        "iam:CreateRole",
         "iam:PassRole"
       ],
       "Effect": "Allow",

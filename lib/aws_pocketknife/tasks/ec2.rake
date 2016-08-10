@@ -7,6 +7,15 @@ namespace :ec2 do
     AwsPocketknife::Ec2.share_ami(image_id: args[:instance_id], user_id: args[:instance_id])
   end
 
+  desc 'bake ami'
+  task :bake_ami, [:image_id, :name, :description]  do |t, args|
+    instance_id = args[:instance_id]
+    name = args[:name]
+    description = args[:description]
+    image_id = AwsPocketknife::Ec2.create_image(instance_id: instance_id, name: name, description: description)
+    puts "image_id: #{image_id}"
+  end
+
   desc 'Stop instance by id'
   task :stop_by_id, [:instance_id]  do |t, args|
     AwsPocketknife::Ec2.stop_instance_by_id(args[:instance_id])
