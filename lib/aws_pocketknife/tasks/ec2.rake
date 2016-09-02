@@ -17,7 +17,7 @@ namespace :ec2 do
       puts "images: #{images}"
     end
 
-    desc "clean up old AMIs"
+    desc "clean up old AMIs."
     task :clean, [:ami_name_pattern, :instance_name_pattern, :days] do |t, args|
       ami_name_pattern = args[:ami_name_pattern]
       instance_name_pattern = args[:instance_name_pattern]

@@ -21,11 +21,28 @@ module AwsPocketknife
 
       def clean_ami(options)
         puts "options: #{options}"
+        days = options.fetch(:days, '30').to_i * 24 * 3600
+        creation_time = Time.now-days
+        puts "Cleaning up images older than #{days} days (creation_time=#{creation_time})"
+
+        image_ids = []
         images = @aws_helper_ec2_client.images_find_by_tags(Name: options.fetch(:ami_name_pattern, ''))
+        images.each do |image|
+          date_tag = image.tags.detect { |tag| tag.key == 'Date' }
+          unless date_tag.nil?
+            image_creation_time = Time.parse(date_tag.value)
+            if creation_time <= image_creation_time
+              image_ids << image.image_id
+            else
+              puts "image #{image.image_id} (creation_time: #{image_creation_time}) WILL NOT be deleted"
+            end
+          end
+        end
+
         instances = describe_instances_by_name name: options.fetch(:instance_name_pattern, '')
-        images_id = images.map { |image| image.image_id}
-        puts "images: #{images_id}"
-        puts "instances: #{instances}"
+
+        puts "images: #{image_ids}"
+        #puts "instances: #{instances}"
 
       end
 
