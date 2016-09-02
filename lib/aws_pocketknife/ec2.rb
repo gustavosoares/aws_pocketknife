@@ -22,8 +22,11 @@ module AwsPocketknife
       def clean_ami(options)
         puts "options: #{options}"
         images = @aws_helper_ec2_client.images_find_by_tags(Name: options.fetch(:ami_name_pattern, ''))
+        instances = describe_instances_by_name name: options.fetch(:instance_name_pattern, '')
         images_id = images.map { |image| image.image_id}
         puts "images: #{images_id}"
+        puts "instances: #{instances}"
+
       end
 
       def share_ami(image_id: "", user_id: "", options: {})
