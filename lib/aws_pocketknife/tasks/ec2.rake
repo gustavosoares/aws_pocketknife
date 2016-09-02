@@ -2,19 +2,31 @@ require_relative '../ec2'
 
 namespace :ec2 do
 
-  desc 'share ami'
-  task :share_ami, [:image_id, :user_id]  do |t, args|
-    AwsPocketknife::Ec2.share_ami(image_id: args[:instance_id], user_id: args[:instance_id])
+  namespace :ami do
+    desc 'share ami'
+    task :share, [:image_id, :user_id]  do |t, args|
+      AwsPocketknife::Ec2.share_ami(image_id: args[:instance_id], user_id: args[:instance_id])
+    end
+
+    desc 'bake ami'
+    task :bake, [:image_id, :name, :description]  do |t, args|
+      instance_id = args[:instance_id]
+      name = args[:name]
+      description = args[:description]
+      images = AwsHelpers::EC2.new.images_find_by_tags(Name: ami_name_pattern)
+      puts "images: #{images}"
+    end
+
+    desc "clean up old AMIs"
+    task :clean, [:ami_name_pattern, :instance_name_pattern, :days] do |t, args|
+      ami_name_pattern = args[:ami_name_pattern]
+      instance_name_pattern = args[:instance_name_pattern]
+      days = args[:days]
+      AwsPocketknife::Ec2.clean_ami ami_name_pattern: ami_name_pattern, instance_name_pattern: instance_name_pattern, days: days
+    end
+
   end
 
-  desc 'bake ami'
-  task :bake_ami, [:image_id, :name, :description]  do |t, args|
-    instance_id = args[:instance_id]
-    name = args[:name]
-    description = args[:description]
-    image_id = AwsPocketknife::Ec2.create_image(instance_id: instance_id, name: name, description: description)
-    puts "image_id: #{image_id}"
-  end
 
   desc 'Stop instance by id'
   task :stop_by_id, [:instance_id]  do |t, args|

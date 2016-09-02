@@ -1,4 +1,5 @@
 require 'aws_pocketknife'
+require 'aws_helpers'
 require 'base64'
 require 'openssl'
 require 'recursive-open-struct'
@@ -12,10 +13,18 @@ module AwsPocketknife
     DELAY_SECONDS = 10
 
     @ec2_client = AwsPocketknife.ec2_client
+    @aws_helper_ec2_client = AwsHelpers::EC2.new
     @log = AwsPocketknife::Common::Logging.get_log
 
     class << self
       include AwsPocketknife::Common::Utils
+
+      def clean_ami(options)
+        puts "options: #{options}"
+        images = @aws_helper_ec2_client.images_find_by_tags(Name: options.fetch(:ami_name_pattern, ''))
+        images_id = images.map { |image| image.image_id}
+        puts "images: #{images_id}"
+      end
 
       def share_ami(image_id: "", user_id: "", options: {})
         begin
