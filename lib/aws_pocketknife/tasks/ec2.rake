@@ -18,11 +18,10 @@ namespace :ec2 do
     end
 
     desc "clean up old AMIs."
-    task :clean, [:ami_name_pattern, :instance_name_pattern, :days] do |t, args|
+    task :clean, [:ami_name_pattern, :days] do |t, args|
       ami_name_pattern = args[:ami_name_pattern]
-      instance_name_pattern = args[:instance_name_pattern]
       days = args[:days]
-      AwsPocketknife::Ec2.clean_ami ami_name_pattern: ami_name_pattern, instance_name_pattern: instance_name_pattern, days: days
+      AwsPocketknife::Ec2.clean_ami ami_name_pattern: ami_name_pattern, days: days
     end
 
   end

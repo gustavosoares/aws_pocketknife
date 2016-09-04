@@ -26,6 +26,8 @@ module AwsPocketknife
         puts "Cleaning up images older than #{days} days (creation_time=#{creation_time})"
 
         image_ids = []
+        images_to_delete = []
+
         images = @aws_helper_ec2_client.images_find_by_tags(Name: options.fetch(:ami_name_pattern, ''))
         images.each do |image|
           date_tag = image.tags.detect { |tag| tag.key == 'Date' }
@@ -39,11 +41,19 @@ module AwsPocketknife
           end
         end
 
-        instances = describe_instances_by_name name: options.fetch(:instance_name_pattern, '')
+        image_ids.each do |image_id|
+          # check if there is any instance using the image id
+          instances = describe_instances_by_image_id(image_id_list: [image_id])
+          if instances.empty?
+            images_to_delete << image_id
+          else
+            puts "#{image_id} is used by #{instances.map { |instance| instance.instance_id }}"
+          end
+          sleep 2
+        end
 
         puts "images: #{image_ids}"
-        #puts "instances: #{instances}"
-
+        puts "images to delete: #{images_to_delete}"
       end
 
       def share_ami(image_id: "", user_id: "", options: {})
@@ -120,6 +130,23 @@ module AwsPocketknife
                                                       values: [name]
                                                   }
                                               ]})
+        resp.reservations.each do |reservation|
+          reservation.instances.each do |instance|
+            instances << instance
+          end
+        end
+        instances
+      end
+
+      def describe_instances_by_image_id(image_id_list: [])
+        instances = []
+        resp = @ec2_client.describe_instances({dry_run: false,
+                                               filters: [
+                                                   {
+                                                       name: "image-id",
+                                                       values: image_id_list
+                                                   }
+                                               ]})
         resp.reservations.each do |reservation|
           reservation.instances.each do |instance|
             instances << instance
