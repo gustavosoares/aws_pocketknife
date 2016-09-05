@@ -1,5 +1,4 @@
 require 'aws_pocketknife'
-require 'aws_helpers'
 require 'base64'
 require 'openssl'
 require 'recursive-open-struct'
@@ -13,7 +12,7 @@ module AwsPocketknife
     DELAY_SECONDS = 10
 
     @ec2_client = AwsPocketknife.ec2_client
-    @aws_helper_ec2_client = AwsHelpers::EC2.new
+    @aws_helper_ec2_client = AwsPocketknife.aws_helper_ec2_client
     @log = AwsPocketknife::Common::Logging.get_log
 
     class << self
