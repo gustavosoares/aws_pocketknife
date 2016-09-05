@@ -1,9 +1,49 @@
 require 'rspec'
 require 'spec_helper'
-
 require 'aws_pocketknife/ec2'
 
+
 describe AwsPocketknife::Ec2 do
+
+  let(:aws_helper_ec2_client) { instance_double(AwsHelpers::EC2) }
+  let(:aws_ec2_client) { instance_double(Aws::EC2::Client) }
+
+  # describe '#clean_ami' do
+  #
+  #   before (:each) do
+  #     AwsPocketknife.instance_variable_set(:@aws_helper_ec2_client, aws_helper_ec2_client)
+  #     AwsPocketknife.instance_variable_set(:@ec2_client, aws_ec2_client)
+  #     allow(Kernel).to receive(:sleep)
+  #   end
+  #
+  #   let(:days) {'15'}
+  #   let(:ami_name_pattern) {'test-*'}
+  #   let(:image_response) {[get_image_response(image_id: '1'),
+  #                          get_image_response(image_id: '2'),
+  #                          get_image_response(image_id: '3')]}
+  #
+  #   it 'should clean old amis' do
+  #
+  #     allow(aws_helper_ec2_client).to receive(:images_find_by_tags)
+  #                                         .with(Name: ami_name_pattern).and_return(image_response)
+  #     expect(aws_helper_ec2_client).to receive(:images_find_by_tags).with(Name: ami_name_pattern)
+  #     expect_any_instance_of(AwsPocketknife::Ec2).to receive(:describe_instances_by_image_id).with(image_id_list: ['1'])
+  #
+  #     AwsPocketknife::Ec2.clean_ami(ami_name_pattern: ami_name_pattern)
+  #     expect(true).to eq(true)
+  #
+  #   end
+  #
+  # end
+
+  def get_image_response(image_id: '', date: '2040-12-16 11:57:42 +1100')
+    RecursiveOpenStruct.new({image_id: image_id,
+                             tags: [
+                                 {key: "Date", value: date}
+                             ]
+                             },
+                             recurse_over_arrays: true)
+  end
 
   describe '#stop_instance_by_id' do
 
