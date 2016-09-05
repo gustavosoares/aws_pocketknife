@@ -10,8 +10,8 @@ module AwsPocketknife
 
       class << self
 
-        def get_log(name: "aws_pocketknife", pattern: "[%l] %d %m")
-          @log ||= initialize_log(name: name, pattern: pattern)
+        def logger
+          @log ||= initialize_log
         end
 
         def initialize_log(name: "aws_pocketknife", pattern: "[%l] %d %m")

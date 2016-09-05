@@ -1,10 +1,20 @@
 require "pretty_table"
 require "awesome_print"
-
+require_relative "logging"
 
 module AwsPocketknife
   module Common
     module Utils
+      #include AwsPocketknife::Common::Logging
+
+      def aws_helper_ec2_client
+        @aws_helper_ec2_client ||= AwsPocketknife.aws_helper_ec2_client
+      end
+
+      def ec2_client
+        @ec2_client ||= AwsPocketknife.ec2_client
+      end
+
       def pretty_table(headers: [], data: [])
         puts PrettyTable.new(data, headers).to_s
       end
