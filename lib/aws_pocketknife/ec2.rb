@@ -19,13 +19,36 @@ module AwsPocketknife
 
       def clean_ami(options)
         puts "options: #{options}"
+
+        image_ids = find_ami_by_creation_time(options)
+        images_to_delete = find_unused_ami(image_ids: image_ids)
+
+        puts "images: #{image_ids}"
+        puts "images to delete: #{images_to_delete}"
+      end
+
+      def find_unused_ami(image_ids: [])
+        images_to_delete = []
+        image_ids.each do |image_id|
+          # check if there is any instance using the image id
+          instances = describe_instances_by_image_id(image_id_list: [image_id])
+          if instances.empty?
+            images_to_delete << image_id
+          else
+            puts "#{image_id} is used by #{instances.map { |instance| instance.instance_id }}"
+          end
+          Kernel.sleep 2
+        end
+        return images_to_delete
+      end
+
+      def find_ami_by_creation_time(options)
+
         days = options.fetch(:days, '30').to_i * 24 * 3600
         creation_time = Time.now-days
         puts "Cleaning up images older than #{days} days (creation_time=#{creation_time})"
 
         image_ids = []
-        images_to_delete = []
-
         images = aws_helper_ec2_client.images_find_by_tags(Name: options.fetch(:ami_name_pattern, ''))
         images.each do |image|
           date_tag = image.tags.detect { |tag| tag.key == 'Date' }
@@ -38,20 +61,7 @@ module AwsPocketknife
             end
           end
         end
-
-        image_ids.each do |image_id|
-          # check if there is any instance using the image id
-          instances = describe_instances_by_image_id(image_id_list: [image_id])
-          if instances.empty?
-            images_to_delete << image_id
-          else
-            puts "#{image_id} is used by #{instances.map { |instance| instance.instance_id }}"
-          end
-          Kernel.sleep 2
-        end
-
-        puts "images: #{image_ids}"
-        puts "images to delete: #{images_to_delete}"
+        return image_ids
       end
 
       def share_ami(image_id: "", user_id: "", options: {})

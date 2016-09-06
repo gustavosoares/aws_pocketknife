@@ -45,6 +45,46 @@ describe AwsPocketknife::Ec2 do
                              recurse_over_arrays: true)
   end
 
+  def get_instance_response(instance_id: '')
+    RecursiveOpenStruct.new({instance_id: instance_id},
+                            recurse_over_arrays: true)
+  end
+
+  describe '#find_unused_ami' do
+
+    let(:image_ids) {['1', '2', '3']}
+
+    before (:each) do
+      allow(Kernel).to receive(:sleep)
+    end
+
+    it 'should return list with ami that can be deleted' do
+
+      first_response = [get_instance_response(instance_id: 'i-1')]
+      second_response = [get_instance_response(instance_id: 'i-2')]
+      third_response = []
+
+      allow(AwsPocketknife::Ec2).to receive(:describe_instances_by_image_id).and_return(first_response, second_response, third_response)
+
+      images_to_delete = AwsPocketknife::Ec2.find_unused_ami(image_ids: image_ids)
+      expect(images_to_delete).to eq(['3'])
+
+    end
+
+    it 'should return empty list when all amis are in use' do
+
+      first_response = [get_instance_response(instance_id: 'i-1')]
+      second_response = [get_instance_response(instance_id: 'i-2')]
+
+      allow(AwsPocketknife::Ec2).to receive(:describe_instances_by_image_id).and_return(first_response, second_response)
+
+      images_to_delete = AwsPocketknife::Ec2.find_unused_ami(image_ids: image_ids)
+      expect(images_to_delete).to eq([])
+
+    end
+
+  end
+
   describe '#stop_instance_by_id' do
 
     it 'should stop one instance' do
