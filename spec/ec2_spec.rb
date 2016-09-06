@@ -5,37 +5,6 @@ require 'aws_pocketknife/ec2'
 
 describe AwsPocketknife::Ec2 do
 
-  let(:aws_helper_ec2_client) { instance_double(AwsHelpers::EC2) }
-  let(:aws_ec2_client) { instance_double(Aws::EC2::Client) }
-
-  # describe '#clean_ami' do
-  #
-  #   before (:each) do
-  #     AwsPocketknife.instance_variable_set(:@aws_helper_ec2_client, aws_helper_ec2_client)
-  #     AwsPocketknife.instance_variable_set(:@ec2_client, aws_ec2_client)
-  #     allow(Kernel).to receive(:sleep)
-  #   end
-  #
-  #   let(:days) {'15'}
-  #   let(:ami_name_pattern) {'test-*'}
-  #   let(:image_response) {[get_image_response(image_id: '1'),
-  #                          get_image_response(image_id: '2'),
-  #                          get_image_response(image_id: '3')]}
-  #
-  #   it 'should clean old amis' do
-  #
-  #     allow(aws_helper_ec2_client).to receive(:images_find_by_tags)
-  #                                         .with(Name: ami_name_pattern).and_return(image_response)
-  #     expect(aws_helper_ec2_client).to receive(:images_find_by_tags).with(Name: ami_name_pattern)
-  #     expect_any_instance_of(AwsPocketknife::Ec2).to receive(:describe_instances_by_image_id).with(image_id_list: ['1'])
-  #
-  #     AwsPocketknife::Ec2.clean_ami(ami_name_pattern: ami_name_pattern)
-  #     expect(true).to eq(true)
-  #
-  #   end
-  #
-  # end
-
   def get_image_response(image_id: '', date: '2040-12-16 11:57:42 +1100')
     RecursiveOpenStruct.new({image_id: image_id,
                              tags: [
@@ -82,6 +51,49 @@ describe AwsPocketknife::Ec2 do
       expect(images_to_delete).to eq([])
 
     end
+
+  end
+
+  describe '#find_ami_by_creation_time' do
+
+    let(:days) {'15'}
+    let(:ami_name_pattern) {'test-*'}
+    let(:options) { {days: days, ami_name_pattern: ami_name_pattern} }
+
+    before (:each) do
+      AwsPocketknife.instance_variable_set(:@aws_helper_ec2_client, nil)
+    end
+
+    it 'should return list of amis with creation time greater than days' do
+
+      first_response = get_image_response image_id: '1', date: '2013-12-16 11:57:42 +1100'
+      second_response = get_image_response image_id: '2', date: '2040-12-16 11:57:42 +1100'
+      aws_helper_ec2_client = instance_double(AwsHelpers::EC2)
+
+      AwsPocketknife.instance_variable_set(:@aws_helper_ec2_client, aws_helper_ec2_client)
+
+      allow(aws_helper_ec2_client).to receive(:images_find_by_tags).and_return([first_response, second_response])
+
+      image_ids = AwsPocketknife::Ec2.find_ami_by_creation_time(options)
+      expect(image_ids).to eq(['2'])
+
+    end
+
+    # it 'should return empty list when no AMIs can be found with creation time greater than days' do
+    #
+    #   first_response = get_image_response image_id: '1', date: '2013-12-16 11:57:42 +1100'
+    #   second_response = get_image_response image_id: '2', date: '2013-12-16 11:57:42 +1100'
+    #   aws_helper_ec2_client = instance_double(AwsHelpers::EC2)
+    #
+    #   AwsPocketknife.instance_variable_set(:@aws_helper_ec2_client, aws_helper_ec2_client)
+    #
+    #   allow(aws_helper_ec2_client).to receive(:images_find_by_tags).and_return([first_response, second_response])
+    #
+    #   image_ids = AwsPocketknife::Ec2.find_ami_by_creation_time(options)
+    #   expect(image_ids).to eq([])
+    #
+    # end
+
 
   end
 
