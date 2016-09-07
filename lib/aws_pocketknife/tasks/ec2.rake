@@ -18,10 +18,12 @@ namespace :ec2 do
     end
 
     desc "clean up old AMIs."
-    task :clean, [:ami_name_pattern, :days] do |t, args|
+    task :clean, [:ami_name_pattern, :days, :dry_run] do |t, args|
+      args.with_defaults(:dry_run => "true")
       ami_name_pattern = args[:ami_name_pattern]
       days = args[:days]
-      AwsPocketknife::Ec2.clean_ami ami_name_pattern: ami_name_pattern, days: days
+      args[:dry_run].strip.downcase == "true" ? dry_run = true : dry_run = false
+      AwsPocketknife::Ec2.clean_ami ami_name_pattern: ami_name_pattern, days: days, dry_run: dry_run
     end
 
   end

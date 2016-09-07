@@ -17,14 +17,42 @@ module AwsPocketknife
 
       Logging = Common::Logging
 
+      def find_ami_by_name(name: '')
+        ec2_client.describe_images({dry_run: false,
+                                    filters: [
+                                        {
+                                            name: "tag:Name",
+                                            values: [name]
+                                        }
+                                    ]}).images
+      end
+
+      def find_ami_by_id(id: '')
+        ec2_client.describe_images({dry_run: false,
+                                    image_ids: [id]}).images.first
+      end
+
+      def delete_ami_by_id(id: '')
+        aws_helper_ec2_client.image_delete(id)
+      end
+
       def clean_ami(options)
         puts "options: #{options}"
 
+        dry_run = options.fetch(:dry_run, true)
         image_ids = find_ami_by_creation_time(options)
         images_to_delete = find_unused_ami(image_ids: image_ids)
 
-        puts "images: #{image_ids}"
-        puts "images to delete: #{images_to_delete}"
+        puts "images (#{image_ids.length}): #{image_ids}"
+        puts "images to delete (#{images_to_delete.length}): #{images_to_delete}"
+
+        unless dry_run
+          images_to_delete.each do |image_id|
+            puts "deleting image #{image_id}"
+            delete_ami_by_id(id: image_id)
+          end
+        end
+
       end
 
       def find_unused_ami(image_ids: [])
@@ -49,7 +77,7 @@ module AwsPocketknife
         puts "Cleaning up images older than #{days} days (creation_time=#{creation_time})"
 
         image_ids = []
-        images = aws_helper_ec2_client.images_find_by_tags(Name: options.fetch(:ami_name_pattern, ''))
+        images = find_ami_by_name(name: options.fetch(:ami_name_pattern, ''))
         images.each do |image|
           date_tag = image.tags.detect { |tag| tag.key == 'Date' }
           unless date_tag.nil?
@@ -193,11 +221,11 @@ module AwsPocketknife
                                  public_ip_address: instance.public_ip_address}, recurse_over_arrays: true)
       end
 
-      private
-
       # def ec2
       #   @ec2 ||= Aws::EC2.new(:ec2_endpoint => "ec2.#{AwsPocketknife::AWS_REGION}.amazonaws.com")
       # end
+
+      private
 
       def create_launch_permission(user_id)
         {

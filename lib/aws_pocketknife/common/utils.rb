@@ -7,12 +7,12 @@ module AwsPocketknife
     module Utils
       #include AwsPocketknife::Common::Logging
 
-      def aws_helper_ec2_client
-        @aws_helper_ec2_client ||= AwsPocketknife.aws_helper_ec2_client
-      end
-
       def ec2_client
         @ec2_client ||= AwsPocketknife.ec2_client
+      end
+
+      def aws_helper_ec2_client
+        @aws_helper_ec2_client ||= AwsPocketknife.aws_helper_ec2_client
       end
 
       def pretty_table(headers: [], data: [])

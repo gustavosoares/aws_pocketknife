@@ -68,34 +68,46 @@ describe AwsPocketknife::Ec2 do
 
       first_response = get_image_response image_id: '1', date: '2013-12-16 11:57:42 +1100'
       second_response = get_image_response image_id: '2', date: '2040-12-16 11:57:42 +1100'
-      aws_helper_ec2_client = instance_double(AwsHelpers::EC2)
 
-      AwsPocketknife.instance_variable_set(:@aws_helper_ec2_client, aws_helper_ec2_client)
-
-      allow(aws_helper_ec2_client).to receive(:images_find_by_tags).and_return([first_response, second_response])
+      allow(AwsPocketknife::Ec2).to receive(:find_ami_by_name).and_return([first_response, second_response])
 
       image_ids = AwsPocketknife::Ec2.find_ami_by_creation_time(options)
       expect(image_ids).to eq(['2'])
 
     end
 
-    # it 'should return empty list when no AMIs can be found with creation time greater than days' do
-    #
-    #   first_response = get_image_response image_id: '1', date: '2013-12-16 11:57:42 +1100'
-    #   second_response = get_image_response image_id: '2', date: '2013-12-16 11:57:42 +1100'
-    #   aws_helper_ec2_client = instance_double(AwsHelpers::EC2)
-    #
-    #   AwsPocketknife.instance_variable_set(:@aws_helper_ec2_client, aws_helper_ec2_client)
-    #
-    #   allow(aws_helper_ec2_client).to receive(:images_find_by_tags).and_return([first_response, second_response])
-    #
-    #   image_ids = AwsPocketknife::Ec2.find_ami_by_creation_time(options)
-    #   expect(image_ids).to eq([])
-    #
-    # end
+    it 'should return empty list when no AMIs can be found with creation time greater than days' do
+
+      first_response = get_image_response image_id: '1', date: '2013-12-15 11:57:42 +1100'
+      second_response = get_image_response image_id: '2', date: '2013-12-16 11:57:42 +1100'
+
+      allow(AwsPocketknife::Ec2).to receive(:find_ami_by_name).and_return([first_response, second_response])
+
+      image_ids = AwsPocketknife::Ec2.find_ami_by_creation_time(options)
+      expect(image_ids).to eq([])
+
+    end
 
 
   end
+
+  describe '#delete_ami_by_id' do
+
+    let(:image_id) {'ami-1234567'}
+    let(:ec2_client) {instance_double(Aws::EC2::Client)}
+    let(:aws_helper_ec2_client) {instance_double(AwsHelpers::EC2)}
+
+    it 'should delete ami with sucess' do
+
+      allow(AwsPocketknife::Ec2).to receive(:aws_helper_ec2_client).and_return(aws_helper_ec2_client)
+      allow(aws_helper_ec2_client).to receive(:image_delete).with(image_id)
+      expect(aws_helper_ec2_client).to receive(:image_delete).with(image_id)
+
+      AwsPocketknife::Ec2.delete_ami_by_id(id: image_id)
+
+    end
+  end
+
 
   describe '#stop_instance_by_id' do
 
