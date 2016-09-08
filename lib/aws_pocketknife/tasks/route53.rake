@@ -1,51 +1,24 @@
 require_relative "../route53"
 
+require_relative '../cli/route53'
+
+route53_cli = AwsPocketknife::Cli::Route53.new
+
 namespace :route53 do
 
   desc "Describe hosted zone"
   task :describe_hosted_zone, [:hosted_zone] do |t, args|
-    hosted_zone = AwsPocketknife::Route53.describe_hosted_zone(hosted_zone: args[:hosted_zone])
-    unless hosted_zone.nil?
-      AwsPocketknife::Route53.nice_print(object: hosted_zone.to_h)
-    else
-      puts "#{args[:hosted_zone]} not found"
-    end
+    route53_cli.describe_hosted_zone(args)
   end
 
   desc "Listed hosted zones"
   task :list_hosted_zones do
-    hosted_zones = AwsPocketknife::Route53.list_hosted_zones
-    headers = [ 'Name', 'Zone ID', 'Comment']
-    data = []
-    hosted_zones.each do |h|
-      data << [h.name,
-               AwsPocketknife::Route53.get_hosted_zone_id(hosted_zone: h.id),
-               h.config.comment]
-    end
-    AwsPocketknife::Route53.pretty_table(headers: headers, data: data)
+    route53_cli.list
   end
 
   desc "List records for hosted zone"
   task :list_records, [:hosted_zone] do |t, args|
-    records = AwsPocketknife::Route53.list_records_for_zone_name(hosted_zone_name: args[:hosted_zone])
-    headers = ["Name", "Type", "DNS Name"]
-    data = []
-    if records.length > 0
-      records.each do |record|
-        if record.type == 'CNAME'
-          data << [record.name, record.type, record.resource_records[0].value]
-        else
-          if record.alias_target.nil?
-            data << [record.name, record.type, "N/A"]
-          else
-            data << [record.name, record.type, record.alias_target.dns_name]
-          end
-        end
-      end
-      AwsPocketknife::Route53.pretty_table(headers: headers, data: data)
-    else
-      puts "No records found hosted zone #{args[:hosted_zone]}"
-    end
+    route53_cli.list_records(args[:hosted_zone])
   end
 
   desc "Get record for hosted zone. Record type accepts SOA, A, TXT, NS, CNAME, MX, PTR, SRV, SPF, AAAA"

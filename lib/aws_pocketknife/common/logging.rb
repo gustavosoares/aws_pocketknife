@@ -1,24 +1,30 @@
 require 'log4r'
-include Log4r
-
-Log4r::Logger.root.level = Log4r::INFO
 
 module AwsPocketknife
   module Common
     module Logging
+
+      include Log4r
+      Logger = Log4r::Logger
+      Log4r::Logger.root.level = Log4r::INFO
+
       class << self
-        def get_log(name: "aws_pocketknife", pattern: "[%l] %d %m")
 
-          log = Log4r::Logger.new(name)
+        def logger
+          @log ||= initialize_log
+        end
 
-          log_format = PatternFormatter.new(:pattern => pattern)
+        def initialize_log(name: "aws_pocketknife", pattern: "[%l] %d %m")
+          log = Logger.new(name)
+
+          log_format = Log4r::PatternFormatter.new(:pattern => pattern)
           log_output = Log4r::StdoutOutputter.new 'console'
           log_output.formatter = log_format
-
           log.add(log_output)
 
           return log
         end
+
       end
     end
   end

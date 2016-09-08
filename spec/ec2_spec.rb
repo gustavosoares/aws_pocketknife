@@ -1,9 +1,135 @@
 require 'rspec'
 require 'spec_helper'
-
 require 'aws_pocketknife/ec2'
 
+
 describe AwsPocketknife::Ec2 do
+
+  let (:snapshot_id) { 'snap-12345678' }
+
+  # stub aws describe_image call
+  # .state #=> String, one of "pending", "available", "invalid", "deregistered", "transient", "failed", "error"
+  def get_image_response(image_id: '', date: '2040-12-16 11:57:42 +1100', state: AwsPocketknife::Ec2::STATE_PENDING)
+    if image_id.empty?
+      return nil
+    else
+      return RecursiveOpenStruct.new({image_id: image_id, state: state,
+          tags: [
+              {key: "Date", value: date}
+          ],
+          block_device_mappings: [
+              {ebs: {snapshot_id: snapshot_id}}
+          ]
+      },
+          recurse_over_arrays: true)
+    end
+
+  end
+
+  def get_instance_response(instance_id: '')
+    RecursiveOpenStruct.new({instance_id: instance_id},
+                            recurse_over_arrays: true)
+  end
+
+  describe '#find_unused_ami' do
+
+    let(:image_ids) {['1', '2', '3']}
+
+    before (:each) do
+      allow(Kernel).to receive(:sleep)
+    end
+
+    it 'should return list with ami that can be deleted' do
+
+      first_response = [get_instance_response(instance_id: 'i-1')]
+      second_response = [get_instance_response(instance_id: 'i-2')]
+      third_response = []
+
+      allow(AwsPocketknife::Ec2).to receive(:describe_instances_by_image_id).and_return(first_response, second_response, third_response)
+
+      images_to_delete = AwsPocketknife::Ec2.find_unused_ami(image_ids: image_ids)
+      expect(images_to_delete).to eq(['3'])
+
+    end
+
+    it 'should return empty list when all amis are in use' do
+
+      first_response = [get_instance_response(instance_id: 'i-1')]
+      second_response = [get_instance_response(instance_id: 'i-2')]
+
+      allow(AwsPocketknife::Ec2).to receive(:describe_instances_by_image_id).and_return(first_response, second_response)
+
+      images_to_delete = AwsPocketknife::Ec2.find_unused_ami(image_ids: image_ids)
+      expect(images_to_delete).to eq([])
+
+    end
+
+  end
+
+  describe '#find_ami_by_creation_time' do
+
+    let(:days) {'15'}
+    let(:ami_name_pattern) {'test-*'}
+    let(:options) { {days: days, ami_name_pattern: ami_name_pattern} }
+
+    before (:each) do
+      AwsPocketknife.instance_variable_set(:@aws_helper_ec2_client, nil)
+    end
+
+    it 'should return list of amis with creation time greater than days' do
+
+      first_response = get_image_response image_id: '1', date: '2013-12-16 11:57:42 +1100'
+      second_response = get_image_response image_id: '2', date: '2040-12-16 11:57:42 +1100'
+
+      allow(AwsPocketknife::Ec2).to receive(:find_ami_by_name).and_return([first_response, second_response])
+
+      image_ids = AwsPocketknife::Ec2.find_ami_by_creation_time(options)
+      expect(image_ids).to eq(['2'])
+
+    end
+
+    it 'should return empty list when no AMIs can be found with creation time greater than days' do
+
+      first_response = get_image_response image_id: '1', date: '2013-12-15 11:57:42 +1100'
+      second_response = get_image_response image_id: '2', date: '2013-12-16 11:57:42 +1100'
+
+      allow(AwsPocketknife::Ec2).to receive(:find_ami_by_name).and_return([first_response, second_response])
+
+      image_ids = AwsPocketknife::Ec2.find_ami_by_creation_time(options)
+      expect(image_ids).to eq([])
+
+    end
+
+
+  end
+
+  describe '#delete_ami_by_id' do
+
+    let(:image_id) {'ami-1234567'}
+    let(:ec2_client) {instance_double(Aws::EC2::Client)}
+    let(:aws_helper_ec2_client) {instance_double(AwsHelpers::EC2)}
+
+    it 'should delete ami with sucess' do
+
+      first_response = get_image_response image_id: '1', date: '2013-12-15 11:57:42 +1100', state: AwsPocketknife::Ec2::STATE_PENDING
+      second_response = get_image_response image_id: '1', date: '2013-12-15 11:57:42 +1100', state: AwsPocketknife::Ec2::STATE_PENDING
+      third_response = get_image_response image_id: '1', date: '2013-12-15 11:57:42 +1100', state: AwsPocketknife::Ec2::STATE_DEREGISTERED
+      fourth_response = get_image_response image_id: ''
+
+      allow(AwsPocketknife::Ec2).to receive(:ec2_client).and_return(ec2_client)
+      allow(AwsPocketknife::Ec2).to receive(:find_ami_by_id).and_return(first_response, second_response, third_response, fourth_response)
+      allow(ec2_client).to receive(:deregister_image).with(image_id: image_id)
+      allow(ec2_client).to receive(:deregister_image).with(image_id: image_id)
+      allow(Kernel).to receive(:sleep)
+
+      expect(ec2_client).to receive(:delete_snapshot).with(snapshot_id: snapshot_id)
+      expect(AwsPocketknife::Ec2).to receive(:find_ami_by_id).with(id: image_id).exactly(4).times()
+
+      AwsPocketknife::Ec2.delete_ami_by_id(id: image_id)
+
+    end
+  end
+
 
   describe '#stop_instance_by_id' do
 
