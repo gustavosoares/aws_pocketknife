@@ -59,8 +59,32 @@ Or install it yourself as:
 
 ## Usage
 
-Type bundle exec rake -vT to see the list of available tasks
+Use the pocketknife that get installed
 
+```
+$ pocketknife 
+Commands:
+  pocketknife ami SUBCOMMAND ...ARGS      # ami command lines
+  pocketknife eb SUBCOMMAND ...ARGS       # elastic beanstalk command lines
+  pocketknife ec2 SUBCOMMAND ...ARGS      # ec2 command lines
+  pocketknife help [COMMAND]              # Describe available commands or one specific command
+  pocketknife route53 SUBCOMMAND ...ARGS  # route53 command lines
+
+```
+
+### EC2
+
+```
+$ pocketknife ec2 help
+Commands:
+  pocketknife ec2 describe_instance_by_id INSTANCE_ID  # find instances by id.
+  pocketknife ec2 find_instances_by_name NAME          # find instances by name. (You can filter by adding *) 
+  pocketknife ec2 get_windows_password INSTANCE_ID     # get windows password.
+  pocketknife ec2 help [COMMAND]                       # Describe subcommands or one specific subcommand
+  pocketknife ec2 start INSTANCE_ID                    # start ec2 instance
+  pocketknife ec2 stop INSTANCE_ID                     # stop ec2 instance
+
+```
 
 ## Development
 

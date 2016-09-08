@@ -1,7 +1,9 @@
 require_relative '../ec2'
 require_relative '../cli/ec2'
+require_relative '../cli/ami'
 
 ec2_cli = AwsPocketknife::Cli::Ec2.new
+ami_cli = AwsPocketknife::Cli::Ami.new
 
 namespace :ec2 do
 
@@ -26,7 +28,7 @@ namespace :ec2 do
       ami_name_pattern = args[:ami_name_pattern]
       days = args[:days]
       args[:dry_run].strip.downcase == "true" ? dry_run = true : dry_run = false
-      AwsPocketknife::Ec2.clean_ami ami_name_pattern: ami_name_pattern, days: days, dry_run: dry_run
+      ami_cli.clean ami_name_pattern, days
     end
 
   end
