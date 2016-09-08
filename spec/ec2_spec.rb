@@ -5,13 +5,25 @@ require 'aws_pocketknife/ec2'
 
 describe AwsPocketknife::Ec2 do
 
-  def get_image_response(image_id: '', date: '2040-12-16 11:57:42 +1100')
-    RecursiveOpenStruct.new({image_id: image_id,
-                             tags: [
-                                 {key: "Date", value: date}
-                             ]
-                             },
-                             recurse_over_arrays: true)
+  let (:snapshot_id) { 'snap-12345678' }
+
+  # stub aws describe_image call
+  # .state #=> String, one of "pending", "available", "invalid", "deregistered", "transient", "failed", "error"
+  def get_image_response(image_id: '', date: '2040-12-16 11:57:42 +1100', state: AwsPocketknife::Ec2::STATE_PENDING)
+    if image_id.empty?
+      return nil
+    else
+      return RecursiveOpenStruct.new({image_id: image_id, state: state,
+          tags: [
+              {key: "Date", value: date}
+          ],
+          block_device_mappings: [
+              {ebs: {snapshot_id: snapshot_id}}
+          ]
+      },
+          recurse_over_arrays: true)
+    end
+
   end
 
   def get_instance_response(instance_id: '')
@@ -99,9 +111,19 @@ describe AwsPocketknife::Ec2 do
 
     it 'should delete ami with sucess' do
 
-      allow(AwsPocketknife::Ec2).to receive(:aws_helper_ec2_client).and_return(aws_helper_ec2_client)
-      allow(aws_helper_ec2_client).to receive(:image_delete).with(image_id)
-      expect(aws_helper_ec2_client).to receive(:image_delete).with(image_id)
+      first_response = get_image_response image_id: '1', date: '2013-12-15 11:57:42 +1100', state: AwsPocketknife::Ec2::STATE_PENDING
+      second_response = get_image_response image_id: '1', date: '2013-12-15 11:57:42 +1100', state: AwsPocketknife::Ec2::STATE_PENDING
+      third_response = get_image_response image_id: '1', date: '2013-12-15 11:57:42 +1100', state: AwsPocketknife::Ec2::STATE_DEREGISTERED
+      fourth_response = get_image_response image_id: ''
+
+      allow(AwsPocketknife::Ec2).to receive(:ec2_client).and_return(ec2_client)
+      allow(AwsPocketknife::Ec2).to receive(:find_ami_by_id).and_return(first_response, second_response, third_response, fourth_response)
+      allow(ec2_client).to receive(:deregister_image).with(image_id: image_id)
+      allow(ec2_client).to receive(:deregister_image).with(image_id: image_id)
+      allow(Kernel).to receive(:sleep)
+
+      expect(ec2_client).to receive(:delete_snapshot).with(snapshot_id: snapshot_id)
+      expect(AwsPocketknife::Ec2).to receive(:find_ami_by_id).with(id: image_id).exactly(4).times()
 
       AwsPocketknife::Ec2.delete_ami_by_id(id: image_id)
 

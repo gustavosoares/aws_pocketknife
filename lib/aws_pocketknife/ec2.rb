@@ -1,6 +1,7 @@
 require 'aws_pocketknife'
 require 'base64'
 require 'openssl'
+require 'retryable'
 require 'recursive-open-struct'
 require_relative "common/utils"
 require_relative "common/logging"
@@ -10,6 +11,13 @@ module AwsPocketknife
 
     MAX_ATTEMPTS = 15
     DELAY_SECONDS = 10
+
+    STATE_PENDING = 'pending'
+    STATE_AVAILABLE = 'available'
+    STATE_DEREGISTERED = 'deregistered'
+    STATE_INVALID = 'invalid'
+    STATE_FAILED = 'failed'
+    STATE_ERROR = 'error'
 
     class << self
       include AwsPocketknife::Common::Utils
@@ -33,7 +41,36 @@ module AwsPocketknife
       end
 
       def delete_ami_by_id(id: '')
-        aws_helper_ec2_client.image_delete(id)
+        image = find_ami_by_id(id: id)
+        snapshot_ids = snapshot_ids(image)
+        ec2_client.deregister_image(image_id: id)
+
+        Retryable.retryable(:tries => 20, :sleep => lambda { |n| 2**n }, :on => StandardError) do |retries, exception|
+          image = find_ami_by_id(id: id)
+          message =  "retry #{retries} - Deleting image #{id}"
+          message << " State: #{image.state}" if image
+          puts message
+          raise StandardError unless image.nil?
+        end
+
+        delete_snapshots(snapshot_ids: snapshot_ids)
+        #aws_helper_ec2_client.image_delete(id)
+      end
+
+      def delete_snapshots(snapshot_ids: [])
+        snapshot_ids.each do |snapshot_id|
+          puts "Deleting Snapshot: #{snapshot_id}"
+          ec2_client.delete_snapshot(snapshot_id: snapshot_id)
+        end
+      end
+
+      def snapshot_ids(image)
+        snapshot_ids = []
+        image.block_device_mappings.each do |device_mapping|
+          ebs = device_mapping.ebs
+          snapshot_ids << ebs.snapshot_id if ebs && !ebs.snapshot_id.to_s.empty?
+        end
+        snapshot_ids
       end
 
       def clean_ami(options)
