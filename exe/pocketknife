@@ -2,4 +2,4 @@
 
 require 'aws_pocketknife/cli/main'
 
-AwsPocketknife::Cli.start(ARGV)
+AwsPocketknife::Cli::Main.start(ARGV)
