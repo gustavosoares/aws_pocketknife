@@ -1,6 +1,5 @@
 require "aws_pocketknife/version"
 require 'aws-sdk-core'
-require 'aws_helpers'
 
 module AwsPocketknife
   extend self
@@ -9,10 +8,6 @@ module AwsPocketknife
   AWS_PROFILE = ENV['AWS_PROFILE'] || nil
 
   class << self
-
-    def aws_helper_ec2_client
-      @aws_helper_ec2_client ||= AwsHelpers::EC2.new
-    end
 
     def cloudwatch_logs_client
       @cloudwatch_logs_client ||= Aws::CloudWatchLogs::Client.new(get_client_options)
