@@ -55,7 +55,11 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install aws_pocketknife
+```
+git clone https://github.com/MYOB-Technology/aws_pocketknife.git
+bundle install
+rake install
+```
 
 ## Usage
 
