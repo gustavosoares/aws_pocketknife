@@ -11,8 +11,8 @@ module AwsPocketknife
         @ec2_client ||= AwsPocketknife.ec2_client
       end
 
-      def aws_helper_ec2_client
-        @aws_helper_ec2_client ||= AwsPocketknife.aws_helper_ec2_client
+      def iam_client
+        @iam_client ||= AwsPocketknife.iam_client
       end
 
       def pretty_table(headers: [], data: [])
