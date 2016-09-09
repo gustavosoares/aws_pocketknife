@@ -13,6 +13,11 @@ After creating the profiles, you just export the environment variable AWS_PROFIL
 
 To run and/or test the gem locally you need to export the following environment variables
 
+### Windows
+
+    - Install ruby 2.2.x. in your local environment (http://rubyinstaller.org/downloads/)
+    - Download Development kit for Ruby 2.0 and above (same link as above) and extract it somewhere permanent. Then cd to it, run ruby dk.rb init and ruby dk.rb install to bind it to ruby installations in your path.
+    
 ```
 set AWS_ACCESS_KEY_ID=[YOUR AWS ACCESS KEY]
 set AWS_REGION=ap-southeast-2
@@ -20,12 +25,8 @@ set AWS_SECRET_ACCESS_KEY=[YOUR AWS SECRET KEY]
 set SSL_CERT_FILE=[PATH TO CRT FILE]
 ```
 
-## Windows
-
-    - Install ruby 2.2.x. in your local environment (http://rubyinstaller.org/downloads/)
-    - Download Development kit for Ruby 2.0 and above (same link as above) and extract it somewhere permanent. Then cd to it, run ruby dk.rb init and ruby dk.rb install to bind it to ruby installations in your path.
     
-## Linux
+### Linux
 
 Install rvm, then install ruby and create a gemset.
 
@@ -38,6 +39,11 @@ rvm gemset use aws-pocketknife
 gem install bundler
 
 bundle install
+
+export AWS_REGION=ap-southeast-2
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
+export SSL_CERT_FILE=certs/ca-bundle.crt
 ```
 
 
