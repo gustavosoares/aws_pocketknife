@@ -13,10 +13,7 @@ describe AwsPocketknife::Ec2 do
     if image_id.empty?
       return nil
     else
-      return RecursiveOpenStruct.new({image_id: image_id, state: state,
-          tags: [
-              {key: "Date", value: date}
-          ],
+      return RecursiveOpenStruct.new({image_id: image_id, state: state, creation_date: date,
           block_device_mappings: [
               {ebs: {snapshot_id: snapshot_id}}
           ]

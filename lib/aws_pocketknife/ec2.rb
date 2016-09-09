@@ -116,14 +116,11 @@ module AwsPocketknife
         image_ids = []
         images = find_ami_by_name(name: options.fetch(:ami_name_pattern, ''))
         images.each do |image|
-          date_tag = image.tags.detect { |tag| tag.key == 'Date' }
-          unless date_tag.nil?
-            image_creation_time = Time.parse(date_tag.value)
-            if creation_time <= image_creation_time
-              image_ids << image.image_id
-            else
-              puts "image #{image.image_id} (creation_time: #{image_creation_time}) WILL NOT be deleted"
-            end
+          image_creation_time = Time.parse(image.creation_date)
+          if creation_time <= image_creation_time
+            image_ids << image.image_id
+          else
+            puts "image #{image.image_id} (creation_time: #{image_creation_time}) WILL NOT be deleted"
           end
         end
         return image_ids
