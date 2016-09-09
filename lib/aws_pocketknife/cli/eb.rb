@@ -6,8 +6,8 @@ module AwsPocketknife
   module Cli
     class Eb < Thor
 
-      desc "list_env", "list_environments"
-      def list_env
+      desc "list", "list environments"
+      def list
         environments = AwsPocketknife::ElasticBeanstalk.describe_environment
         headers = [ 'App Name', 'Env Name', 'cname', 'Updated', 'Version', 'Health']
         data = []
@@ -17,8 +17,8 @@ module AwsPocketknife
         AwsPocketknife::ElasticBeanstalk.pretty_table(headers: headers, data: data)
       end
 
-      desc "desc_env NAME", "describe environment name"
-      def desc_env(environment_name)
+      desc "desc ENVIRONMENT_NAME", "describe environment name"
+      def desc(environment_name)
         environment = AwsPocketknife::ElasticBeanstalk.describe_environment_resources(environment_name: environment_name)
         unless environment.nil?
           AwsPocketknife::ElasticBeanstalk.nice_print(object: environment.to_h)
@@ -27,8 +27,8 @@ module AwsPocketknife
         end
       end
 
-      desc "list_env_variables NAME", "list environment variables for the environment name"
-      def list_env_variables(environment_name)
+      desc "vars NAME", "list environment variables for the specified elastic beanstalk environment name"
+      def vars(environment_name)
         variables = AwsPocketknife::ElasticBeanstalk.list_environment_variables(environment_name: environment_name)
         headers = [ 'Name', 'Value']
         data = []

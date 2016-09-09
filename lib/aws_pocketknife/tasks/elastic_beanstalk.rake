@@ -8,17 +8,17 @@ namespace :eb do
 
   desc "describe_environment_resources"
   task :describe_environment, [:environment_name] do |t, args|
-    eb_cli.desc_env(args[:environment_name])
+    eb_cli.desc(args[:environment_name])
   end
 
   desc "list environments"
   task :list_environments do
-    eb_cli.list_env
+    eb_cli.list
   end
 
   desc "list environment variables for an environment"
   task :list_environment_variables, [:environment_name] do |t, args|
-    eb_cli.list_env_variables(args[:environment_name])
+    eb_cli.vars(args[:environment_name])
   end
 
 end
