@@ -8,7 +8,7 @@ describe AwsPocketknife::Asg do
   let(:asg_client) {instance_double(Aws::AutoScaling::Client)}
 
   before (:each) do
-    allow(AwsPocketknife::Asg).to receive(:asg_client).and_return(asg_client)
+    allow(subject).to receive(:asg_client).and_return(asg_client)
   end
 
   describe '#describe_asg_by_name' do
