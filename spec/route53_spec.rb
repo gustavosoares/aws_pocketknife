@@ -5,17 +5,24 @@ require 'aws_pocketknife/route53'
 
 describe AwsPocketknife::Route53 do
 
+  let(:route53_client) {instance_double(Aws::Route53::Client)}
+
+  before (:each) do
+    allow(AwsPocketknife::Route53).to receive(:route53_client).and_return(route53_client)
+  end
+
   describe '#get_hosted_zone_id' do
     it 'should get hosted zone id' do
       hosted_zone = "/hostedzone/ABC"
-      expect(AwsPocketknife::Route53.get_hosted_zone_id(hosted_zone: hosted_zone)).to eq("ABC")
+      expect(subject.get_hosted_zone_id(hosted_zone: hosted_zone)).to eq("ABC")
     end
   end
 
   describe '#list_hosted_zones' do
     it 'should list hosted zones' do
-      expect_any_instance_of(Aws::Route53::Client).to receive(:list_hosted_zones)
-      AwsPocketknife::Route53.list_hosted_zones
+      allow(route53_client).to receive(:list_hosted_zones)
+      expect(route53_client).to receive(:list_hosted_zones)
+      subject.list_hosted_zones
     end
   end
 
@@ -34,12 +41,12 @@ describe AwsPocketknife::Route53 do
           {name: "example2.com", type: "A"},
       ]})
 
-      allow(AwsPocketknife::Route53).to receive(:describe_hosted_zone).and_return(aws_hosted_zone_response)
+      allow(subject).to receive(:describe_hosted_zone).and_return(aws_hosted_zone_response)
 
-      allow(AwsPocketknife::Route53).to receive(:get_hosted_zone_id)
+      allow(subject).to receive(:get_hosted_zone_id)
                                             .with(hosted_zone: hosted_zone_id).and_return(hosted_zone_id)
 
-      allow_any_instance_of(Aws::Route53::Client).to receive(:list_resource_record_sets)
+      allow(route53_client).to receive(:list_resource_record_sets)
                                                          .with({hosted_zone_id: hosted_zone_id,
                                                                 start_record_name: record_name,
                                                                 start_record_type: record_type,
@@ -47,7 +54,7 @@ describe AwsPocketknife::Route53 do
                                                                })
                                                          .and_return(aws_records_response)
 
-      record = AwsPocketknife::Route53.get_record(hosted_zone_name: hosted_zone_name, record_name: record_name, record_type: record_type)
+      record = subject.get_record(hosted_zone_name: hosted_zone_name, record_name: record_name, record_type: record_type)
       expect(record.length).to eq(1)
       expect(record[0].name).to eq(record_name)
 
@@ -66,12 +73,12 @@ describe AwsPocketknife::Route53 do
           {name: "example2.com", type: "A"},
       ]})
 
-      allow(AwsPocketknife::Route53).to receive(:describe_hosted_zone).and_return(aws_hosted_zone_response)
+      allow(subject).to receive(:describe_hosted_zone).and_return(aws_hosted_zone_response)
 
-      allow(AwsPocketknife::Route53).to receive(:get_hosted_zone_id)
+      allow(subject).to receive(:get_hosted_zone_id)
                                             .with(hosted_zone: hosted_zone_id).and_return(hosted_zone_id)
 
-      allow_any_instance_of(Aws::Route53::Client).to receive(:list_resource_record_sets)
+      allow(route53_client).to receive(:list_resource_record_sets)
                                                          .with({hosted_zone_id: hosted_zone_id,
                                                                 start_record_name: record_name,
                                                                 start_record_type: record_type,
@@ -79,7 +86,7 @@ describe AwsPocketknife::Route53 do
                                                                })
                                                          .and_return(aws_records_response)
 
-      record = AwsPocketknife::Route53.get_record(hosted_zone_name: hosted_zone_name, record_name: record_name, record_type: record_type)
+      record = subject.get_record(hosted_zone_name: hosted_zone_name, record_name: record_name, record_type: record_type)
       expect(record.length).to eq(0)
       expect(record).to eq([])
 
@@ -89,8 +96,8 @@ describe AwsPocketknife::Route53 do
 
   describe '#list_records_for_zone_name' do
     it 'should return an empty []' do
-      allow(AwsPocketknife::Route53).to receive(:describe_hosted_zone).and_return(nil)
-      expect(AwsPocketknife::Route53.list_records_for_zone_name(hosted_zone_name: "test")).to eq([])
+      allow(subject).to receive(:describe_hosted_zone).and_return(nil)
+      expect(subject.list_records_for_zone_name(hosted_zone_name: "test")).to eq([])
     end
 
     it 'should list_records_for_zone_name for record type in ["A", "CNAME", "AAAA"]' do
@@ -104,16 +111,16 @@ describe AwsPocketknife::Route53 do
           {name: "example3.com", type: "AAAA"}
       ]})
 
-      allow(AwsPocketknife::Route53).to receive(:describe_hosted_zone).and_return(aws_hosted_zone_response)
+      allow(subject).to receive(:describe_hosted_zone).and_return(aws_hosted_zone_response)
 
-      allow(AwsPocketknife::Route53).to receive(:get_hosted_zone_id)
+      allow(subject).to receive(:get_hosted_zone_id)
                                             .with(hosted_zone: hosted_zone_id).and_return(hosted_zone_id)
 
-      allow_any_instance_of(Aws::Route53::Client).to receive(:list_resource_record_sets)
+      allow(route53_client).to receive(:list_resource_record_sets)
                                                          .with({hosted_zone_id: hosted_zone_id})
                                                          .and_return(aws_records_response)
 
-      records = AwsPocketknife::Route53.list_records_for_zone_name(hosted_zone_name: hosted_zone_name)
+      records = subject.list_records_for_zone_name(hosted_zone_name: hosted_zone_name)
 
       expect(records.length).to eq(3)
       i = 0
@@ -135,16 +142,16 @@ describe AwsPocketknife::Route53 do
           {name: "example3.com", type: "TXT"}
       ]}, recurse_over_arrays: true)
 
-      allow(AwsPocketknife::Route53).to receive(:describe_hosted_zone).and_return(aws_hosted_zone_response)
+      allow(subject).to receive(:describe_hosted_zone).and_return(aws_hosted_zone_response)
 
-      allow(AwsPocketknife::Route53).to receive(:get_hosted_zone_id)
+      allow(subject).to receive(:get_hosted_zone_id)
                                             .with(hosted_zone: hosted_zone_id).and_return(hosted_zone_id)
 
-      allow_any_instance_of(Aws::Route53::Client).to receive(:list_resource_record_sets)
+      allow(route53_client).to receive(:list_resource_record_sets)
                                                          .with({hosted_zone_id: hosted_zone_id})
                                                          .and_return(aws_records_response)
 
-      records = AwsPocketknife::Route53.list_records_for_zone_name(hosted_zone_name: hosted_zone_name)
+      records = subject.list_records_for_zone_name(hosted_zone_name: hosted_zone_name)
 
       expect(records.length).to eq(0)
 
@@ -197,25 +204,25 @@ describe AwsPocketknife::Route53 do
                                         })
       aws_response_3 = get_aws_response({alias_target: {hosted_zone_id: "id", dns_name: destiny_dns_name}})
 
-      expect(AwsPocketknife::Route53).to receive(:describe_hosted_zone)
+      expect(subject).to receive(:describe_hosted_zone)
                       .with(hosted_zone: origin_hosted_zone)
                       .and_return(aws_response_1)
 
-      expect(AwsPocketknife::Route53).to receive(:get_record)
+      expect(subject).to receive(:get_record)
                                              .with(hosted_zone_name: origin_hosted_zone,
                                                    record_name: origin_dns_name,
                                                    record_type: record_type)
                                              .and_return([aws_response_2])
 
-      expect(AwsPocketknife::Route53).to receive(:get_record)
+      expect(subject).to receive(:get_record)
                                              .with(hosted_zone_name: destiny_hosted_zone,
                                                    record_name: destiny_dns_name,
                                                    record_type: record_type)
                                              .and_return([aws_response_3])
 
-      expect_any_instance_of(Aws::Route53::Client).to receive(:change_resource_record_sets).with(payload)
+      allow(route53_client).to receive(:change_resource_record_sets).with(payload)
 
-      AwsPocketknife::Route53.update_record(origin_hosted_zone: origin_hosted_zone,
+      subject.update_record(origin_hosted_zone: origin_hosted_zone,
                                             origin_dns_name: origin_dns_name,
                                             record_type: record_type,
                                             destiny_dns_name: destiny_dns_name,
@@ -266,25 +273,25 @@ describe AwsPocketknife::Route53 do
                                         })
       aws_response_3 = get_aws_response({alias_target: {hosted_zone_id: "id", dns_name: destiny_dns_name}})
 
-      expect(AwsPocketknife::Route53).to receive(:describe_hosted_zone)
+      expect(subject).to receive(:describe_hosted_zone)
                                              .with(hosted_zone: origin_hosted_zone)
                                              .and_return(aws_response_1)
 
-      expect(AwsPocketknife::Route53).to receive(:get_record)
+      expect(subject).to receive(:get_record)
                                              .with(hosted_zone_name: origin_hosted_zone,
                                                    record_name: origin_dns_name,
                                                    record_type: record_type)
                                              .and_return([aws_response_2])
 
-      expect(AwsPocketknife::Route53).to receive(:get_record)
+      expect(subject).to receive(:get_record)
                                              .with(hosted_zone_name: destiny_hosted_zone,
                                                    record_name: destiny_dns_name,
                                                    record_type: record_type)
                                              .and_return([aws_response_3])
 
-      expect_any_instance_of(Aws::Route53::Client).not_to receive(:change_resource_record_sets).with(payload)
+      expect(route53_client).not_to receive(:change_resource_record_sets).with(payload)
 
-      AwsPocketknife::Route53.update_record(origin_hosted_zone: origin_hosted_zone,
+      subject.update_record(origin_hosted_zone: origin_hosted_zone,
                                             origin_dns_name: origin_dns_name,
                                             record_type: record_type,
                                             destiny_dns_name: destiny_dns_name,
@@ -323,26 +330,26 @@ describe AwsPocketknife::Route53 do
       }
 
       aws_response_1 = get_aws_response({id: hosted_zone_id})
-      aws_response_2 = get_aws_response({
-                                            alias_target:
+      aws_response_2 = get_aws_response({alias_target:
                                                 {
                                                     hosted_zone_id: "id", dns_name: origin_dns_name},
                                                     resource_records: [{value: origin_dns_name}]
                                         })
 
-      expect(AwsPocketknife::Route53).to receive(:describe_hosted_zone)
+      expect(subject).to receive(:describe_hosted_zone)
                                              .with(hosted_zone: origin_hosted_zone)
                                              .and_return(aws_response_1)
 
-      expect(AwsPocketknife::Route53).to receive(:get_record)
+      expect(subject).to receive(:get_record)
                                              .with(hosted_zone_name: origin_hosted_zone,
                                                    record_name: origin_dns_name,
                                                    record_type: record_type)
                                              .and_return([aws_response_2])
 
-      expect_any_instance_of(Aws::Route53::Client).to receive(:change_resource_record_sets).with(payload)
+      allow(route53_client).to receive(:change_resource_record_sets).with(payload)
+      expect(route53_client).to receive(:change_resource_record_sets).with(payload)
 
-      AwsPocketknife::Route53.update_record(origin_hosted_zone: origin_hosted_zone,
+      subject.update_record(origin_hosted_zone: origin_hosted_zone,
                                             origin_dns_name: origin_dns_name,
                                             record_type: record_type,
                                             destiny_dns_name: destiny_dns_name,
@@ -388,19 +395,19 @@ describe AwsPocketknife::Route53 do
                                                     resource_records: [{value: origin_dns_name}]
                                         })
 
-      expect(AwsPocketknife::Route53).to receive(:describe_hosted_zone)
+      expect(subject).to receive(:describe_hosted_zone)
                                              .with(hosted_zone: origin_hosted_zone)
                                              .and_return(aws_response_1)
 
-      expect(AwsPocketknife::Route53).to receive(:get_record)
+      expect(subject).to receive(:get_record)
                                              .with(hosted_zone_name: origin_hosted_zone,
                                                    record_name: origin_dns_name,
                                                    record_type: record_type)
                                              .and_return([aws_response_2])
 
-      expect_any_instance_of(Aws::Route53::Client).not_to receive(:change_resource_record_sets).with(payload)
+      expect(route53_client).not_to receive(:change_resource_record_sets).with(payload)
 
-      result = AwsPocketknife::Route53.update_record(origin_hosted_zone: origin_hosted_zone,
+      result = subject.update_record(origin_hosted_zone: origin_hosted_zone,
                                                      origin_dns_name: origin_dns_name,
                                                      record_type: record_type,
                                                      destiny_dns_name: destiny_dns_name,

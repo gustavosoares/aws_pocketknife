@@ -5,13 +5,11 @@ require_relative "common/utils"
 module AwsPocketknife
   module Route53
 
-    @client = AwsPocketknife.route53_client
-
     class << self
       include AwsPocketknife::Common::Utils
 
       def list_hosted_zones
-        result = @client.list_hosted_zones
+        result = route53_client.list_hosted_zones
         unless result.nil?
          return result.hosted_zones
         else
@@ -102,13 +100,13 @@ module AwsPocketknife
 
         result = nil
         if record_name.length != 0 and record_type != 0
-          result = @client.list_resource_record_sets({hosted_zone_id: hosted_zone_id,
+          result = route53_client.list_resource_record_sets({hosted_zone_id: hosted_zone_id,
                                                       start_record_name: record_name,
                                                       start_record_type: record_type, # accepts SOA, A, TXT, NS, CNAME, MX, PTR, SRV, SPF, AAAA
                                                       max_items: 1,
                                                      })
         else
-          result = @client.list_resource_record_sets({hosted_zone_id: hosted_zone_id})
+          result = route53_client.list_resource_record_sets({hosted_zone_id: hosted_zone_id})
         end
         result.resource_record_sets.each do |record|
           if ["A", "CNAME", "AAAA"].include?record.type
@@ -157,7 +155,7 @@ module AwsPocketknife
         payload = get_payload_for_record_update(change: change, hosted_zone_id: hosted_zone_id)
 
         nice_print(object: payload)
-        result = @client.change_resource_record_sets(payload)
+        result = route53_client.change_resource_record_sets(payload)
 
       end
 
@@ -220,7 +218,7 @@ module AwsPocketknife
         payload = get_payload_for_record_update(change: change, hosted_zone_id: hosted_zone_id)
 
         nice_print(object: payload)
-        result = @client.change_resource_record_sets(payload)
+        result = route53_client.change_resource_record_sets(payload)
 
       end
 
