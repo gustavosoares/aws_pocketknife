@@ -9,8 +9,7 @@ module AwsPocketknife
       desc "clean AMI_NAME_PATTERN DAYS --dry_run", "clean ami based in a pattern name with creation time lower than DAYS, i.e, test-*"
       option :dry_run, :type => :boolean, :default => true, :desc => 'just show images that would be deleted'
       def clean(ami_name_pattern, days)
-
-        dry_run = options[:dry_run]
+        dry_run = options.fetch(:dry_run, true)
         AwsPocketknife::Ec2.clean_ami ami_name_pattern: ami_name_pattern,
                                       days: days,
                                       dry_run: dry_run
