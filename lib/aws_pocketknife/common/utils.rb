@@ -15,6 +15,14 @@ module AwsPocketknife
         @iam_client ||= AwsPocketknife.iam_client
       end
 
+      def route53_client
+        @route53_client ||= AwsPocketknife.route53_client
+      end
+
+      def elb_client
+        @elb_client ||= AwsPocketknife.elb_client
+      end
+
       def pretty_table(headers: [], data: [])
         puts PrettyTable.new(data, headers).to_s
       end
