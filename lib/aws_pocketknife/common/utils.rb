@@ -27,6 +27,10 @@ module AwsPocketknife
         @asg_client ||= AwsPocketknife.asg_client
       end
 
+      def cloudwatch_logs_client
+        @cloudwatch_logs_client ||= AwsPocketknife.cloudwatch_logs_client
+      end
+
       def pretty_table(headers: [], data: [])
         puts PrettyTable.new(data, headers).to_s
       end

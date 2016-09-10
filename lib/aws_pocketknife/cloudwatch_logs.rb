@@ -7,15 +7,13 @@ require_relative "common/utils"
 module AwsPocketknife
   module CloudwatchLogs
 
-    @cloudwatch_logs_client = AwsPocketknife.cloudwatch_logs_client
-
     class << self
       include AwsPocketknife::Common::Utils
 
       def create_log_group(log_group_name: "")
 
-        if log_group_name.length != 0
-          resp = @cloudwatch_logs_client.create_log_group({
+        unless log_group_name.empty?
+          cloudwatch_logs_client.create_log_group({
                log_group_name: log_group_name, # required
            })
         end
