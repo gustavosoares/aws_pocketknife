@@ -126,7 +126,7 @@ module AwsPocketknife
         return image_ids
       end
 
-      def share_ami(image_id: "", user_id: "", options: {})
+      def share_ami(image_id: '', user_id: '', options: {})
         begin
           options = {}
           options[:image_id] = image_id
