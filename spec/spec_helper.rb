@@ -12,6 +12,19 @@ ensure
   $stdout = old
 end
 
+def capture(stream)
+  begin
+    stream = stream.to_s
+    eval "$#{stream} = StringIO.new"
+    yield
+    result = eval("$#{stream}").string
+  ensure
+    eval("$#{stream} = #{stream.upcase}")
+  end
+
+  result
+end
+
 def get_aws_response(object)
   RecursiveOpenStruct.new(object, recurse_over_arrays: true)
 end
