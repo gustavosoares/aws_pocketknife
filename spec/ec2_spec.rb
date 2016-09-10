@@ -5,7 +5,11 @@ require 'aws_pocketknife/ec2'
 
 describe AwsPocketknife::Ec2 do
 
-  let (:snapshot_id) { 'snap-12345678' }
+  let(:snapshot_id) { 'snap-12345678' }
+  let(:image_id) {'ami-1234567'}
+  let(:instance_id) {'i-1234'}
+  let(:user_id) { '12345678' }
+  let(:ec2_client) {instance_double(Aws::EC2::Client)}
 
   # stub aws describe_image call
   # .state #=> String, one of "pending", "available", "invalid", "deregistered", "transient", "failed", "error"
@@ -13,19 +17,28 @@ describe AwsPocketknife::Ec2 do
     if image_id.empty?
       return nil
     else
-      return RecursiveOpenStruct.new({image_id: image_id, state: state, creation_date: date,
+      get_aws_response({image_id: image_id, state: state, creation_date: date,
           block_device_mappings: [
-              {ebs: {snapshot_id: snapshot_id}}
-          ]
-      },
-          recurse_over_arrays: true)
+          {ebs: {snapshot_id: snapshot_id}}
+      ]
+      })
     end
 
   end
 
   def get_instance_response(instance_id: '')
-    RecursiveOpenStruct.new({instance_id: instance_id},
-                            recurse_over_arrays: true)
+    get_aws_response({instance_id: instance_id})
+  end
+
+  before (:each) do
+    allow(AwsPocketknife::Ec2).to receive(:ec2_client).and_return(ec2_client)
+  end
+
+  describe '#share_ami' do
+
+    it 'should call modify_image_attribute with success' do
+
+    end
   end
 
   describe '#find_unused_ami' do
@@ -69,18 +82,14 @@ describe AwsPocketknife::Ec2 do
     let(:ami_name_pattern) {'test-*'}
     let(:options) { {days: days, ami_name_pattern: ami_name_pattern} }
 
-    before (:each) do
-      AwsPocketknife.instance_variable_set(:@aws_helper_ec2_client, nil)
-    end
-
     it 'should return list of amis with creation time greater than days' do
 
       first_response = get_image_response image_id: '1', date: '2013-12-16 11:57:42 +1100'
       second_response = get_image_response image_id: '2', date: '2040-12-16 11:57:42 +1100'
 
-      allow(AwsPocketknife::Ec2).to receive(:find_ami_by_name).and_return([first_response, second_response])
+      allow(subject).to receive(:find_ami_by_name).and_return([first_response, second_response])
 
-      image_ids = AwsPocketknife::Ec2.find_ami_by_creation_time(options)
+      image_ids = subject.find_ami_by_creation_time(options)
       expect(image_ids).to eq(['2'])
 
     end
@@ -90,9 +99,9 @@ describe AwsPocketknife::Ec2 do
       first_response = get_image_response image_id: '1', date: '2013-12-15 11:57:42 +1100'
       second_response = get_image_response image_id: '2', date: '2013-12-16 11:57:42 +1100'
 
-      allow(AwsPocketknife::Ec2).to receive(:find_ami_by_name).and_return([first_response, second_response])
+      allow(subject).to receive(:find_ami_by_name).and_return([first_response, second_response])
 
-      image_ids = AwsPocketknife::Ec2.find_ami_by_creation_time(options)
+      image_ids = subject.find_ami_by_creation_time(options)
       expect(image_ids).to eq([])
 
     end
@@ -102,10 +111,6 @@ describe AwsPocketknife::Ec2 do
 
   describe '#delete_ami_by_id' do
 
-    let(:image_id) {'ami-1234567'}
-    let(:ec2_client) {instance_double(Aws::EC2::Client)}
-    let(:aws_helper_ec2_client) {instance_double(AwsHelpers::EC2)}
-
     it 'should delete ami with sucess' do
 
       first_response = get_image_response image_id: '1', date: '2013-12-15 11:57:42 +1100', state: AwsPocketknife::Ec2::STATE_PENDING
@@ -113,16 +118,15 @@ describe AwsPocketknife::Ec2 do
       third_response = get_image_response image_id: '1', date: '2013-12-15 11:57:42 +1100', state: AwsPocketknife::Ec2::STATE_DEREGISTERED
       fourth_response = get_image_response image_id: ''
 
-      allow(AwsPocketknife::Ec2).to receive(:ec2_client).and_return(ec2_client)
-      allow(AwsPocketknife::Ec2).to receive(:find_ami_by_id).and_return(first_response, second_response, third_response, fourth_response)
+      allow(subject).to receive(:find_ami_by_id).and_return(first_response, second_response, third_response, fourth_response)
       allow(ec2_client).to receive(:deregister_image).with(image_id: image_id)
       allow(ec2_client).to receive(:deregister_image).with(image_id: image_id)
       allow(Kernel).to receive(:sleep)
 
       expect(ec2_client).to receive(:delete_snapshot).with(snapshot_id: snapshot_id)
-      expect(AwsPocketknife::Ec2).to receive(:find_ami_by_id).with(id: image_id).exactly(4).times()
+      expect(subject).to receive(:find_ami_by_id).with(id: image_id).exactly(4).times()
 
-      AwsPocketknife::Ec2.delete_ami_by_id(id: image_id)
+      subject.delete_ami_by_id(id: image_id)
 
     end
   end
@@ -134,24 +138,24 @@ describe AwsPocketknife::Ec2 do
 
       instance_id = "1"
 
-      allow(AwsPocketknife::Ec2).to receive(:wait_till_instance_is_stopped).and_return("mock")
+      allow(subject).to receive(:wait_till_instance_is_stopped).and_return("mock")
 
-      expect_any_instance_of(Aws::EC2::Client).to receive(:stop_instances)
-                                                      .with({ instance_ids: ["1"] })
+      allow(ec2_client).to receive(:stop_instances).with({ instance_ids: ["1"] })
+      expect(ec2_client).to receive(:stop_instances).with({ instance_ids: ["1"] })
 
-      AwsPocketknife::Ec2.stop_instance_by_id(instance_id)
+      subject.stop_instance_by_id(instance_id)
     end
 
     it 'should stop list of instances' do
 
       instance_id = "1;2;3"
 
-      allow(AwsPocketknife::Ec2).to receive(:wait_till_instance_is_stopped).and_return("mock")
+      allow(subject).to receive(:wait_till_instance_is_stopped).and_return("mock")
 
-      expect_any_instance_of(Aws::EC2::Client).to receive(:stop_instances)
-                                                      .with({ instance_ids: ["1", "2", "3"] })
+      allow(ec2_client).to receive(:stop_instances).with({ instance_ids: ["1", "2", "3"] })
+      expect(ec2_client).to receive(:stop_instances).with({ instance_ids: ["1", "2", "3"] })
 
-      AwsPocketknife::Ec2.stop_instance_by_id(instance_id)
+      subject.stop_instance_by_id(instance_id)
     end
 
   end
@@ -162,9 +166,10 @@ describe AwsPocketknife::Ec2 do
 
       instance_id = "1"
 
-      expect_any_instance_of(Aws::EC2::Client).to receive(:start_instances)
-                                                      .with({ instance_ids: ["1"] })
-      AwsPocketknife::Ec2.start_instance_by_id(instance_id)
+      allow(ec2_client).to receive(:start_instances).with({ instance_ids: ["1"] })
+      expect(ec2_client).to receive(:start_instances).with({ instance_ids: ["1"] })
+
+      subject.start_instance_by_id(instance_id)
 
     end
 
@@ -172,9 +177,10 @@ describe AwsPocketknife::Ec2 do
 
       instance_id = "1;2;3"
 
-      expect_any_instance_of(Aws::EC2::Client).to receive(:start_instances)
-                                                      .with({ instance_ids: ["1", "2", "3"] })
-      AwsPocketknife::Ec2.start_instance_by_id(instance_id)
+      allow(ec2_client).to receive(:start_instances).with({ instance_ids: ["1", "2", "3"] })
+      expect(ec2_client).to receive(:start_instances).with({ instance_ids: ["1", "2", "3"] })
+
+      subject.start_instance_by_id(instance_id)
     end
 
   end
@@ -185,11 +191,11 @@ describe AwsPocketknife::Ec2 do
 
       name = "test"
 
-      aws_response = RecursiveOpenStruct.new({reservations: [
-          {instances: []}
-      ]}, recurse_over_arrays: true)
+      aws_response = get_aws_response({reservations: [
+          {instances: [{instance_id: instance_id}]}
+      ]})
 
-      expect_any_instance_of(Aws::EC2::Client).to receive(:describe_instances)
+      allow(ec2_client).to receive(:describe_instances)
                                                       .with({dry_run: false,
                                                              filters: [
                                                                  {
@@ -199,7 +205,8 @@ describe AwsPocketknife::Ec2 do
                                                              ]})
                                                       .and_return(aws_response)
 
-      instances = AwsPocketknife::Ec2.describe_instances_by_name(name: name)
+      instances = subject.describe_instances_by_name(name: name)
+      expect(instances.first.instance_id).to eq(instance_id)
     end
   end
 
@@ -212,11 +219,11 @@ describe AwsPocketknife::Ec2 do
           {instances: []}
       ]})
 
-      expect_any_instance_of(Aws::EC2::Client).to receive(:describe_instances)
+      allow(ec2_client).to receive(:describe_instances)
                                                       .with({dry_run: false, instance_ids: [instance_id]})
                                                       .and_return(aws_response)
 
-      instance = AwsPocketknife::Ec2.describe_instance_by_id(instance_id: instance_id)
+      instance = subject.describe_instance_by_id(instance_id: instance_id)
       expect(instance).to eq(nil)
     end
 
@@ -227,11 +234,11 @@ describe AwsPocketknife::Ec2 do
           {instances: [{instance_id: instance_id}]}
       ]}, recurse_over_arrays: true)
 
-      expect_any_instance_of(Aws::EC2::Client).to receive(:describe_instances)
+      allow(ec2_client).to receive(:describe_instances)
                                                       .with({dry_run: false, instance_ids: [instance_id]})
                                                       .and_return(aws_response)
 
-      instance = AwsPocketknife::Ec2.describe_instance_by_id(instance_id: instance_id)
+      instance = subject.describe_instance_by_id(instance_id: instance_id)
       expect(instance).to_not eq(nil)
       expect(instance.instance_id).to eq(instance_id)
     end
@@ -248,15 +255,14 @@ describe AwsPocketknife::Ec2 do
       encrypted_password = "sdjadaldl"
       private_keyfile = "test"
       
-      aws_response = RecursiveOpenStruct.new({password_data: encrypted_password}, recurse_over_arrays: true)
+      aws_response = get_aws_response({password_data: encrypted_password})
 
 
-      expect_any_instance_of(Aws::EC2::Client).to receive(:get_password_data)
-                                                      .with({dry_run: false, instance_id: instance_id})
+      allow(ec2_client).to receive(:get_password_data).with({dry_run: false, instance_id: instance_id})
                                                       .and_return(aws_response)
 
       allow(ENV).to receive(:[]).with("AWS_POCKETKNIFE_KEYFILE_DIR").and_return(private_keyfile_dir)
-      allow(AwsPocketknife::Ec2).to receive(:describe_instance_by_id)
+      allow(subject).to receive(:describe_instance_by_id)
                                         .with(instance_id: instance_id)
                                         .and_return(RecursiveOpenStruct.new({key_name: key_name},
                                                                             recurse_over_arrays: true))
@@ -264,12 +270,12 @@ describe AwsPocketknife::Ec2 do
                          .with("test").and_return(true)
       allow(File).to receive(:join)
                          .with(private_keyfile_dir, "#{key_name}.pem").and_return(private_keyfile)
-      allow(AwsPocketknife::Ec2).to receive(:decrypt_windows_password)
+      allow(subject).to receive(:decrypt_windows_password)
                                         .with(encrypted_password, private_keyfile)
                                         .and_return("my_password")
 
 
-      instance = AwsPocketknife::Ec2.get_windows_password(instance_id: instance_id)
+      instance = subject.get_windows_password(instance_id: instance_id)
       expect(instance.password).to eq("my_password")
     end
   end
