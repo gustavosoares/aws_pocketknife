@@ -7,16 +7,11 @@ require_relative "common/utils"
 module AwsPocketknife
   module Elb
 
-    MAX_ATTEMPTS = 15
-    DELAY_SECONDS = 10
-
-    @elb_client = AwsPocketknife.elb_client
-
     class << self
       include AwsPocketknife::Common::Utils
 
-      def describe_elb_by_name(name: "")
-        resp = @elb_client.describe_load_balancers({
+      def describe_elb_by_name(name: '')
+        resp = elb_client.describe_load_balancers({
                                                   load_balancer_names: [name],
                                                   page_size: 1,
                                               })
