@@ -23,6 +23,10 @@ module AwsPocketknife
         @elb_client ||= AwsPocketknife.elb_client
       end
 
+      def asg_client
+        @asg_client ||= AwsPocketknife.asg_client
+      end
+
       def pretty_table(headers: [], data: [])
         puts PrettyTable.new(data, headers).to_s
       end
