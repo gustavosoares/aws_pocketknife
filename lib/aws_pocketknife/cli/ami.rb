@@ -1,12 +1,11 @@
 require "thor"
 require "aws_pocketknife"
-require "aws_pocketknife/ec2"
 
 module AwsPocketknife
   module Cli
     class Ami < Thor
 
-      desc "clean AMI_NAME_PATTERN DAYS --dry_run", "clean ami based in a pattern name with creation time lower than DAYS, i.e, test-*"
+      desc "clean AMI_NAME_PATTERN DAYS --dry_run", "Given a name or filter (i.e, test-*), this command will delete all matched AMIs (and associated snapshots) with creation time lower than DAYS."
       option :dry_run, :type => :boolean, :default => true, :desc => 'just show images that would be deleted'
       def clean(ami_name_pattern, days)
         dry_run = options.fetch(:dry_run, true)
