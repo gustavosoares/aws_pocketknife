@@ -1,6 +1,5 @@
 require "thor"
 require "aws_pocketknife"
-require "aws_pocketknife/ec2"
 
 module AwsPocketknife
   module Cli

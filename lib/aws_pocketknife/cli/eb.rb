@@ -1,6 +1,5 @@
 require "thor"
 require "aws_pocketknife"
-require "aws_pocketknife/elastic_beanstalk"
 
 module AwsPocketknife
   module Cli
