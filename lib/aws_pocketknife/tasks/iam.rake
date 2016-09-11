@@ -1,21 +1,23 @@
 require_relative "../iam"
+require_relative '../cli/iam'
+
+iam_cli = AwsPocketknife::Cli::Iam.new
 
 namespace :iam do
 
   desc 'List ssl certificates'
   task :list_ssl_certificates do
-    certs = AwsPocketknife::Iam.list_ssl_certificates
-    AwsPocketknife::Iam.nice_print(object: certs.to_h)
+    iam_cli.list_ssl_certs
   end
 
   desc 'Create IAM User'
   task :create_user, [:username]  do |_t, args|
-    AwsPocketknife::Iam.create_iam_user(args[:username])
+    iam_cli.create_user args[:username]
   end
 
   desc 'Create IAM Group'
   task :create_group, [:group_name]  do |_t, args|
-    AwsPocketknife::Iam.create_group(args[:group_name])
+    iam_cli.create_group args[:group_name]
   end
 
   desc 'Create IAM Policy from file. You pass list of s3 buckets like so: s1bucket;s2bucket'
@@ -30,7 +32,7 @@ namespace :iam do
 
   desc 'Add user to Group'
   task :attach_user_to_group, [:username,:group_name]  do |_t, args|
-    AwsPocketknife::Iam.add_user_to_group(args[:username],args[:group_name])
+    iam_cli.add_user_to_group args[:username], args[:group_name]
   end
 
   desc 'Create Role'
