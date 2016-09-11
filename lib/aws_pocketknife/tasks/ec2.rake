@@ -13,26 +13,16 @@ namespace :ec2 do
       AwsPocketknife::Ec2.share_ami(image_id: args[:instance_id], user_id: args[:instance_id])
     end
 
-    desc 'bake ami'
-    task :bake, [:image_id, :name, :description]  do |t, args|
-      instance_id = args[:instance_id]
-      name = args[:name]
-      description = args[:description]
-      images = AwsHelpers::EC2.new.images_find_by_tags(Name: ami_name_pattern)
-      puts "images: #{images}"
-    end
-
     desc "clean up old AMIs."
     task :clean, [:ami_name_pattern, :days, :dry_run] do |t, args|
       args.with_defaults(:dry_run => "true")
       ami_name_pattern = args[:ami_name_pattern]
       days = args[:days]
       args[:dry_run].strip.downcase == "true" ? dry_run = true : dry_run = false
+      AwsPocketknife::Cli::Ami.options = {:dry_run => dry_run}
       ami_cli.clean ami_name_pattern, days
     end
-
   end
-
 
   desc 'Stop instance by id'
   task :stop_by_id, [:instance_id]  do |t, args|
@@ -45,18 +35,18 @@ namespace :ec2 do
   end
 
   desc 'Describe instance by id'
-  task :describe_instance_by_id, [:instance_id]  do |t, args|
-    ec2_cli.describe_instance_by_id(args[:instance_id])
+  task :find_by_id, [:instance_id]  do |t, args|
+    ec2_cli.find_by_id(args[:instance_id])
   end
 
   desc 'Describe instance by name'
   task :describe_instance_by_name, [:name]  do |t, args|
-    ec2_cli.find_instances_by_name(args[:name])
+    ec2_cli.find_by_name(args[:name])
   end
 
   desc 'Find instances by name'
-  task :find_instances_by_name, [:name]  do |t, args|
-    ec2_cli.find_instances_by_name(args[:name])
+  task :find_by_name, [:name]  do |t, args|
+    ec2_cli.find_by_name(args[:name])
   end
 
   desc 'Get windows password'

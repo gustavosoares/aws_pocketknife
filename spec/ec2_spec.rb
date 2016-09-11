@@ -2,7 +2,6 @@ require 'rspec'
 require 'spec_helper'
 require 'aws_pocketknife/ec2'
 
-
 describe AwsPocketknife::Ec2 do
 
   let(:snapshot_id) { 'snap-12345678' }
@@ -10,25 +9,6 @@ describe AwsPocketknife::Ec2 do
   let(:instance_id) {'i-1234'}
   let(:user_id) { '12345678' }
   let(:ec2_client) {instance_double(Aws::EC2::Client)}
-
-  # stub aws describe_image call
-  # .state #=> String, one of "pending", "available", "invalid", "deregistered", "transient", "failed", "error"
-  def get_image_response(image_id: '', date: '2040-12-16 11:57:42 +1100', state: AwsPocketknife::Ec2::STATE_PENDING)
-    if image_id.empty?
-      return nil
-    else
-      get_aws_response({image_id: image_id, state: state, creation_date: date,
-          block_device_mappings: [
-          {ebs: {snapshot_id: snapshot_id}}
-      ]
-      })
-    end
-
-  end
-
-  def get_instance_response(instance_id: '')
-    get_aws_response({instance_id: instance_id})
-  end
 
   before (:each) do
     allow(AwsPocketknife::Ec2).to receive(:ec2_client).and_return(ec2_client)
@@ -205,7 +185,7 @@ describe AwsPocketknife::Ec2 do
                                                              ]})
                                                       .and_return(aws_response)
 
-      instances = subject.describe_instances_by_name(name: name)
+      instances = subject.find_by_name(name: name)
       expect(instances.first.instance_id).to eq(instance_id)
     end
   end
@@ -223,7 +203,7 @@ describe AwsPocketknife::Ec2 do
                                                       .with({dry_run: false, instance_ids: [instance_id]})
                                                       .and_return(aws_response)
 
-      instance = subject.describe_instance_by_id(instance_id: instance_id)
+      instance = subject.find_by_id(instance_id: instance_id)
       expect(instance).to eq(nil)
     end
 
@@ -238,7 +218,7 @@ describe AwsPocketknife::Ec2 do
                                                       .with({dry_run: false, instance_ids: [instance_id]})
                                                       .and_return(aws_response)
 
-      instance = subject.describe_instance_by_id(instance_id: instance_id)
+      instance = subject.find_by_id(instance_id: instance_id)
       expect(instance).to_not eq(nil)
       expect(instance.instance_id).to eq(instance_id)
     end
@@ -262,7 +242,7 @@ describe AwsPocketknife::Ec2 do
                                                       .and_return(aws_response)
 
       allow(ENV).to receive(:[]).with("AWS_POCKETKNIFE_KEYFILE_DIR").and_return(private_keyfile_dir)
-      allow(subject).to receive(:describe_instance_by_id)
+      allow(subject).to receive(:find_by_id)
                                         .with(instance_id: instance_id)
                                         .and_return(RecursiveOpenStruct.new({key_name: key_name},
                                                                             recurse_over_arrays: true))

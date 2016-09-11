@@ -6,10 +6,10 @@ module AwsPocketknife
   module Cli
     class Ec2 < Thor
 
-      desc "find_instances_by_name NAME", "find instances by name. (You can filter by adding *) "
-      def find_instances_by_name(name)
+      desc "find_by_name NAME", "find instances by name. (You can filter by adding *) "
+      def find_by_name(name)
 
-        instances = AwsPocketknife::Ec2.describe_instances_by_name(name: name)
+        instances = AwsPocketknife::Ec2.find_by_name(name: name)
         headers = ["name", "id", "image", "state", "private ip", "public ip", "type", "key name", "launch time"]
         data = []
         if instances.length > 0
@@ -26,9 +26,9 @@ module AwsPocketknife
 
       end
 
-      desc "describe_instance_by_id INSTANCE_ID", "find instances by id."
-      def describe_instance_by_id(instance_id)
-        instance = AwsPocketknife::Ec2.describe_instance_by_id(instance_id: instance_id)
+      desc "find_by_id INSTANCE_ID", "find instances by id."
+      def find_by_id(instance_id)
+        instance = AwsPocketknife::Ec2.find_by_id(instance_id: instance_id)
         if instance.nil?
           puts "Instance #{instance_id} not found"
         else

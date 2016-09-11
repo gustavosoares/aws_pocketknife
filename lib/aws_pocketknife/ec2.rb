@@ -151,7 +151,7 @@ module AwsPocketknife
 
         begin
           Logging.logger.info "creating image"
-          instance = describe_instance_by_id(instance_id: instance_id)
+          instance = find_by_id(instance_id: instance_id)
           instance = ec2.instances[instance_id]
           image = instance.create_image(name, :description => description)
           sleep 2 until image.exists?
@@ -191,7 +191,7 @@ module AwsPocketknife
       end
 
       # http://serverfault.com/questions/560337/search-ec2-instance-by-its-name-from-aws-command-line-tool
-      def describe_instances_by_name(name: "")
+      def find_by_name(name: "")
         instances = []
         resp = ec2_client.describe_instances({dry_run: false,
                                               filters: [
@@ -225,7 +225,7 @@ module AwsPocketknife
         instances
       end
 
-      def describe_instance_by_id(instance_id: "")
+      def find_by_id(instance_id: "")
         resp = ec2_client.describe_instances({dry_run: false, instance_ids: [instance_id.to_s]})
         if resp.nil? or resp.reservations.length == 0 or resp.reservations[0].instances.length == 0
           return nil
@@ -239,7 +239,7 @@ module AwsPocketknife
         private_keyfile_dir = ENV["AWS_POCKETKNIFE_KEYFILE_DIR"] || ""
         raise "Environment variable AWS_POCKETKNIFE_KEYFILE_DIR is not defined" if private_keyfile_dir.length == 0
 
-        instance = describe_instance_by_id(instance_id: instance_id)
+        instance = find_by_id(instance_id: instance_id)
         key_name = instance.key_name
         private_keyfile = File.join(private_keyfile_dir, "#{key_name}.pem")
         raise "File #{private_keyfile} not found" unless File.exist?(private_keyfile)
