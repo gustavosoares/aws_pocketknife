@@ -7,10 +7,11 @@ Gem::Specification.new do |spec|
   spec.name          = "aws_pocketknife"
   spec.version       = AwsPocketknife::VERSION
   spec.authors       = ["Gustavo Soares Souza"]
-  spec.email         = ["gustavosoares@gmail.com"]
+  spec.email         = ["gustavo.soares@myob.com"]
 
-  spec.summary       = "Gem to expose some AWS api calls in rake tasks."
-  spec.description   = "Gem to expose some AWS api calls in rake tasks and also to ease the work when managing multiple aws accounts, since one browser can only hold session for one account."
+  spec.summary       = "Command line tools to make aws administration a little bit easier and quicker than using the aws console."
+  spec.description   = "Command line tools to make aws administration a little bit easier and quicker than using the aws console. These commands are also handy if you have multiple aws accounts to manage, since you can't have multiple tabs open for
+different accounts in a web browser. The only way would be to use diffente browsers or open incognito windows."
   spec.homepage      = "https://github.com/MYOB-Technology/aws_pocketknife"
   spec.license       = "MIT"
 
@@ -30,15 +31,12 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'aws-sdk-core', '~> 2.1'
   spec.add_dependency 'retryable', '~> 2.0'
   spec.add_dependency "rake", "~> 10.0"
-  # spec.add_dependency "rspec", "~> 3.4"
-  # spec.add_dependency "webmock", "= 1.24.2"
   spec.add_dependency "erubis", "= 2.7.0"
   spec.add_dependency "pretty_table", "= 0.1.0"
   spec.add_dependency "awesome_print", "= 1.6.1"
   spec.add_dependency "recursive-open-struct",  "= 1.0.1"
   spec.add_dependency "log4r", "= 1.1.10"
   spec.add_dependency "thor", "~> 0.19"
-
 
   spec.add_development_dependency "bundler", "~> 1.11"
   spec.add_development_dependency "rspec", "~> 3.4"
