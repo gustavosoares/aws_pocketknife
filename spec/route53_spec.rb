@@ -1,8 +1,6 @@
 require 'rspec'
 require 'spec_helper'
 
-require 'aws_pocketknife/route53'
-
 describe AwsPocketknife::Route53 do
 
   let(:route53_client) {instance_double(Aws::Route53::Client)}

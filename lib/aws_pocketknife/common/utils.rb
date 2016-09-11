@@ -31,6 +31,10 @@ module AwsPocketknife
         @cloudwatch_logs_client ||= AwsPocketknife.cloudwatch_logs_client
       end
 
+      def elastic_beanstalk_client
+        @elastic_beanstalk_client ||= AwsPocketknife.elastic_beanstalk_client
+      end
+
       def pretty_table(headers: [], data: [])
         puts PrettyTable.new(data, headers).to_s
       end

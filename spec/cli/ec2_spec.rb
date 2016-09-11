@@ -1,8 +1,6 @@
 require 'rspec'
 require 'spec_helper'
 
-require 'aws_pocketknife/cli/ec2'
-
 describe AwsPocketknife::Cli::Ec2 do
 
   let(:instance_name) {'test-*'}

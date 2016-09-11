@@ -1,5 +1,5 @@
+require 'aws_pocketknife'
 require 'recursive-open-struct'
-require 'aws_pocketknife/ec2'
 
 def get_aws_response(object)
   RecursiveOpenStruct.new(object, recurse_over_arrays: true)

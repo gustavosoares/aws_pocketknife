@@ -1,5 +1,4 @@
 require_relative "../route53"
-
 require_relative '../cli/route53'
 
 route53_cli = AwsPocketknife::Cli::Route53.new

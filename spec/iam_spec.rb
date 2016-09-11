@@ -2,9 +2,6 @@ require 'rspec'
 require "rspec/expectations"
 require 'spec_helper'
 
-require 'aws_pocketknife/iam'
-
-
 describe AwsPocketknife::Iam do
 
   describe "#create_user" do

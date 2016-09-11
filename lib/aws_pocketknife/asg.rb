@@ -1,7 +1,6 @@
 require 'aws_pocketknife'
 require 'base64'
 require 'openssl'
-require_relative "common/utils"
 
 module AwsPocketknife
   module Asg

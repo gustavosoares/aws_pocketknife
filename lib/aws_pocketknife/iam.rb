@@ -8,7 +8,7 @@ module AwsPocketknife
       include AwsPocketknife::Common::Utils
 
       def list_ssl_certificates
-        resp = iam_client.list_server_certificates({})
+        iam_client.list_server_certificates({})
       end
       
       def create_iam_user(username)

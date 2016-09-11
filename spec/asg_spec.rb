@@ -1,8 +1,6 @@
 require 'rspec'
 require 'spec_helper'
 
-require 'aws_pocketknife/asg'
-
 describe AwsPocketknife::Asg do
 
   let(:asg_client) {instance_double(Aws::AutoScaling::Client)}

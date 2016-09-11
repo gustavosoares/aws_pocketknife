@@ -1,8 +1,6 @@
 require 'rspec'
 require 'spec_helper'
 
-require 'aws_pocketknife/cli/ami'
-
 describe AwsPocketknife::Cli::Ami do
 
   describe '#clean' do

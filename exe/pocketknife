@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'aws_pocketknife/cli/main'
+require 'aws_pocketknife'
 
 AwsPocketknife::Cli::Main.start(ARGV)

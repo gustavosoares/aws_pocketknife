@@ -1,11 +1,6 @@
 require "thor"
 require "aws_pocketknife"
 
-require_relative "ec2"
-require_relative "ami"
-require_relative "eb"
-require_relative "route53"
-
 module AwsPocketknife
   module Cli
     class Main < Thor
@@ -21,6 +16,9 @@ module AwsPocketknife
 
       desc "route53 SUBCOMMAND ...ARGS", "route53 command lines"
       subcommand "route53", AwsPocketknife::Cli::Route53
+
+      desc "iam SUBCOMMAND ...ARGS", "iam command lines"
+      subcommand "iam", AwsPocketknife::Cli::Iam
 
     end
   end

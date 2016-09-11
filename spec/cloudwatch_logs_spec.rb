@@ -1,8 +1,6 @@
 require 'rspec'
 require 'spec_helper'
 
-require 'aws_pocketknife/cloudwatch_logs'
-
 describe AwsPocketknife::CloudwatchLogs do
 
   let(:cloudwatch_logs_client) {instance_double(Aws::CloudWatchLogs::Client)}

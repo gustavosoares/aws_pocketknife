@@ -3,8 +3,6 @@ require 'base64'
 require 'openssl'
 require 'retryable'
 require 'recursive-open-struct'
-require_relative "common/utils"
-require_relative "common/logging"
 
 module AwsPocketknife
   module Ec2
@@ -54,7 +52,6 @@ module AwsPocketknife
         end
 
         delete_snapshots(snapshot_ids: snapshot_ids)
-        #aws_helper_ec2_client.image_delete(id)
       end
 
       def delete_snapshots(snapshot_ids: [])

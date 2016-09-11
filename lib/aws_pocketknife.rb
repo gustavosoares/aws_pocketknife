@@ -1,5 +1,23 @@
-require "aws_pocketknife/version"
+require 'aws_pocketknife/version'
 require 'aws-sdk-core'
+
+require 'aws_pocketknife/common/utils'
+require 'aws_pocketknife/common/logging'
+
+require 'aws_pocketknife/iam'
+require 'aws_pocketknife/ec2'
+require 'aws_pocketknife/route53'
+require 'aws_pocketknife/asg'
+require 'aws_pocketknife/cloudwatch_logs'
+require 'aws_pocketknife/elastic_beanstalk'
+require 'aws_pocketknife/elb'
+
+require 'aws_pocketknife/cli/iam'
+require 'aws_pocketknife/cli/ec2'
+require 'aws_pocketknife/cli/ami'
+require 'aws_pocketknife/cli/eb'
+require 'aws_pocketknife/cli/route53'
+require 'aws_pocketknife/cli/main'
 
 module AwsPocketknife
   extend self

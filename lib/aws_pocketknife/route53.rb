@@ -1,6 +1,4 @@
 require 'aws_pocketknife'
-require_relative "common/utils"
-
 
 module AwsPocketknife
   module Route53

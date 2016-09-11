@@ -1,6 +1,5 @@
 require 'rspec'
 require 'spec_helper'
-require 'aws_pocketknife/ec2'
 
 describe AwsPocketknife::Ec2 do
 

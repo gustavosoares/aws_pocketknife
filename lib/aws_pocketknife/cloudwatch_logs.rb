@@ -2,7 +2,6 @@ require 'aws_pocketknife'
 require 'base64'
 require 'openssl'
 require 'recursive-open-struct'
-require_relative "common/utils"
 
 module AwsPocketknife
   module CloudwatchLogs
