@@ -2,6 +2,7 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'aws_pocketknife'
 require 'webmock/rspec'
 require 'recursive-open-struct'
+require_relative 'aws_helper'
 
 def capture_stdout(&blk)
   old = $stdout
@@ -23,10 +24,6 @@ def capture(stream)
   end
 
   result
-end
-
-def get_aws_response(object)
-  RecursiveOpenStruct.new(object, recurse_over_arrays: true)
 end
 
 def capture_stderr(&blk)
