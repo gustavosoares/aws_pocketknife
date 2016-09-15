@@ -1,7 +1,4 @@
 require 'aws_pocketknife'
-require 'base64'
-require 'openssl'
-require 'recursive-open-struct'
 
 module AwsPocketknife
   module Elb

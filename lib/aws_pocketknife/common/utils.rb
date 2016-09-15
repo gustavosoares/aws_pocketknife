@@ -19,6 +19,10 @@ module AwsPocketknife
         @route53_client ||= AwsPocketknife.route53_client
       end
 
+      def rds_client
+        @rds_client ||= AwsPocketknife.rds_client
+      end
+
       def elb_client
         @elb_client ||= AwsPocketknife.elb_client
       end

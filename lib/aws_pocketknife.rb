@@ -11,12 +11,15 @@ require 'aws_pocketknife/asg'
 require 'aws_pocketknife/cloudwatch_logs'
 require 'aws_pocketknife/elastic_beanstalk'
 require 'aws_pocketknife/elb'
+require 'aws_pocketknife/rds'
 
 require 'aws_pocketknife/cli/iam'
 require 'aws_pocketknife/cli/ec2'
 require 'aws_pocketknife/cli/ami'
 require 'aws_pocketknife/cli/eb'
 require 'aws_pocketknife/cli/route53'
+require 'aws_pocketknife/cli/rds_snapshot'
+require 'aws_pocketknife/cli/rds'
 require 'aws_pocketknife/cli/main'
 
 module AwsPocketknife

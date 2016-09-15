@@ -20,6 +20,9 @@ module AwsPocketknife
       desc "iam SUBCOMMAND ...ARGS", "iam command lines"
       subcommand "iam", AwsPocketknife::Cli::Iam
 
+      desc "rds SUBCOMMAND ...ARGS", "rds command lines"
+      subcommand "rds", AwsPocketknife::Cli::Rds
+
     end
   end
 end
