@@ -8,13 +8,18 @@ module AwsPocketknife
       desc "list_snapshots DB_NAME", "list snapshots"
       def list(db_name)
         snapshots = AwsPocketknife::Rds.describe_snapshots(db_name: db_name)
-        headers = [ 'Name', 'Creation Time', 'Type', 'Engine Version']
+        headers = [ 'Name', 'Creation Time', 'Snapshot Type', 'Port', 'Engine', 'Version', 'Storage (Gb)', 'IOPS']
         data = []
         snapshots.each do |h|
           data << [h.db_snapshot_identifier,
                    h.snapshot_create_time,
                    h.snapshot_type,
-                   h.engine_version]
+                   h.port,
+                   h.engine,
+                   h.engine_version,
+                   h.allocated_storage,
+                   h.iops
+          ]
         end
         AwsPocketknife::Rds.pretty_table(headers: headers, data: data)
       end

@@ -13,7 +13,8 @@ describe AwsPocketknife::Rds do
 
   describe '#describe_snapshots' do
     it 'should get snapshots' do
-      allow(rds_client).to receive(:describe_db_snapshots).with({db_instance_identifier: db_name})
+      aws_reponse = describe_snapshot_response db_snapshot_identifier: snapshot_name, date: '2040-12-16 11:57:42 +1100'
+      allow(rds_client).to receive(:describe_db_snapshots).with({db_instance_identifier: db_name}).and_return(aws_reponse)
       expect(rds_client).to receive(:describe_db_snapshots).with({db_instance_identifier: db_name})
 
       subject.describe_snapshots db_name: db_name

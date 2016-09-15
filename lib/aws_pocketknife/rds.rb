@@ -8,7 +8,7 @@ module AwsPocketknife
 
       def describe_snapshots(options)
         db_name = options.fetch(:db_name, '')
-        rds_client.describe_db_snapshots({db_instance_identifier: db_name})
+        rds_client.describe_db_snapshots({db_instance_identifier: db_name}).db_snapshots
       end
 
       def clean_snapshots(options)
@@ -23,7 +23,7 @@ module AwsPocketknife
 
         snapshots_to_remove = []
         snapshots = describe_snapshots options
-        snapshots.db_snapshots.each do |snapshot|
+        snapshots.each do |snapshot|
           snapshot.snapshot_create_time.is_a?(String) ? snapshot_creation_time = Time.parse(snapshot.snapshot_create_time) : snapshot_creation_time = snapshot.snapshot_create_time
 
           puts "Snapshot name: #{snapshot.db_snapshot_identifier} | created at #{snapshot.snapshot_create_time}"
