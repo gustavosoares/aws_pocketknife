@@ -108,17 +108,20 @@ module AwsPocketknife
 
         days = options.fetch(:days, '30').to_i * 24 * 3600
         creation_time = Time.now-days
-        puts "Cleaning up images older than #{days} days (creation_time=#{creation_time})"
+        puts "Cleaning up images older than #{days} days, i.e, with creation_time < #{creation_time})"
 
         image_ids = []
         images = find_ami_by_name(name: options.fetch(:ami_name_pattern, ''))
         images.each do |image|
           image_creation_time = Time.parse(image.creation_date)
+          msg = "image #{image.image_id} (#{creation_time}) < (image_creation_time: #{image_creation_time})? "
           if creation_time <= image_creation_time
             image_ids << image.image_id
+            msg << "YES, marking to be deleted"
           else
-            puts "image #{image.image_id} (creation_time: #{image_creation_time}) WILL NOT be deleted"
+            msg << "NO"
           end
+          puts msg
         end
         return image_ids
       end

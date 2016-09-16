@@ -8,7 +8,7 @@ module AwsPocketknife
       desc "clean AMI_NAME_PATTERN DAYS --dry_run", "Given a name or filter (i.e, test-*), this command will delete all matched AMIs (and associated snapshots) with creation time lower than DAYS."
       option :dry_run, :type => :boolean, :default => true, :desc => 'just show images that would be deleted'
       def clean(ami_name_pattern, days)
-        dry_run = options.fetch(:dry_run, true)
+        dry_run = options.fetch("dry_run", true)
         AwsPocketknife::Ec2.clean_ami ami_name_pattern: ami_name_pattern,
                                       days: days,
                                       dry_run: dry_run

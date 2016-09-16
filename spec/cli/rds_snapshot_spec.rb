@@ -35,7 +35,7 @@ describe AwsPocketknife::Cli::RdsSnapshot do
                                                                     days: days,
                                                                     dry_run: dry_run)
 
-      subject.options = {:dry_run => dry_run}
+      subject.options = {"dry_run" => dry_run}
       subject.clean db_name, days
 
     end

@@ -34,7 +34,7 @@ describe AwsPocketknife::Cli::Ami do
                                                               days: days,
                                                               dry_run: dry_run)
 
-      subject.options = {:dry_run => dry_run}
+      subject.options = {"dry_run" => dry_run}
       subject.clean ami_name_pattern, days
 
     end
