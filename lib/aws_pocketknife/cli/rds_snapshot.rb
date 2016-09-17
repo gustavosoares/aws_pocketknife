@@ -34,6 +34,11 @@ module AwsPocketknife
                                             dry_run: dry_run
       end
 
+      desc "create DB_NAME", "Creates a snapshot for database_name."
+      def create(db_name)
+        AwsPocketknife::Rds.create_snapshot db_name: db_name
+      end
+
     end
   end
 end

@@ -3,12 +3,39 @@ require 'aws_pocketknife'
 module AwsPocketknife
   module Rds
 
+    AVAILABLE = 'available'.freeze
+    CREATING = 'creating'.freeze
+    DELETING = 'deleting'.freeze
+
     class << self
       include AwsPocketknife::Common::Utils
 
       def describe_snapshots(options)
         db_name = options.fetch(:db_name, '')
         rds_client.describe_db_snapshots({db_instance_identifier: db_name}).db_snapshots
+      end
+
+      # creates snapshot for the database name
+      def create_snapshot(options)
+        db_name = options.fetch(:db_name, 'my-snapshot')
+        snapshot_name = get_snapshot_name(db_name)
+        rds_client.create_db_snapshot(db_instance_identifier: db_name, db_snapshot_identifier: snapshot_name)
+
+        Retryable.retryable(:tries => 15, :sleep => lambda { |n| 2**n }, :on => StandardError) do |retries, exception|
+          response = rds_client.describe_db_snapshots(db_snapshot_identifier: snapshot_name)
+
+          snapshot = response.db_snapshots.find { |s| s.db_snapshot_identifier == snapshot_name }
+          status = snapshot.status
+          percent_progress = snapshot.percent_progress
+          puts "RDS Snapshot #{snapshot_name} status: #{status}, progress #{percent_progress}%"
+          raise StandardError if status != AwsPocketknife::Rds::AVAILABLE
+        end
+
+      end
+
+      def get_snapshot_name(db_name)
+        now_str = Time.now.strftime('%Y-%m-%d-%H-%M')
+        "#{db_name}-#{now_str}"
       end
 
       def clean_snapshots(options)

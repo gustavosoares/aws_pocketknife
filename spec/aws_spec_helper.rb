@@ -24,10 +24,14 @@ def get_instance_response(instance_id: '')
   get_aws_response({instance_id: instance_id})
 end
 
-def describe_snapshot_response(db_snapshot_identifier: 'my-snapshot', date: '2040-12-16 11:57:42 +1100')
+def describe_snapshot_response(db_snapshot_identifier: 'my-snapshot',
+                               date: '2040-12-16 11:57:42 +1100',
+                               status: AwsPocketknife::Rds::AVAILABLE)
   get_aws_response({db_snapshots: [{
       db_snapshot_identifier: db_snapshot_identifier,
       snapshot_create_time: date,
+      percent_progress: '10',
+      status: status,
       snapshot_type: 'manual'}
   ]})
 end

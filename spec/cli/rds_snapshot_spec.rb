@@ -43,13 +43,18 @@ describe AwsPocketknife::Cli::RdsSnapshot do
   end
 
   describe '#list' do
-
-
     it 'should call describe_snapshots with right arguments' do
       allow(AwsPocketknife::Rds).to receive(:describe_snapshots).with(db_name: db_name).and_return([])
       expect(AwsPocketknife::Rds).to receive(:describe_snapshots).with(db_name: db_name)
-
       subject.list db_name
+    end
+  end
+
+  describe '#create' do
+    it 'should call describe_snapshots with right arguments' do
+      allow(AwsPocketknife::Rds).to receive(:create_snapshot).with(db_name: db_name)
+      expect(AwsPocketknife::Rds).to receive(:create_snapshot).with(db_name: db_name)
+      subject.create db_name
     end
   end
 
