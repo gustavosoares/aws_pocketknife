@@ -23,6 +23,12 @@ module AwsPocketknife
       desc "rds SUBCOMMAND ...ARGS", "rds command lines"
       subcommand "rds", AwsPocketknife::Cli::Rds
 
+      desc "asg SUBCOMMAND ...ARGS", "asg command lines"
+      subcommand "asg", AwsPocketknife::Cli::Asg
+
+      desc "elb SUBCOMMAND ...ARGS", "elb command lines"
+      subcommand "elb", AwsPocketknife::Cli::Elb
+
     end
   end
 end

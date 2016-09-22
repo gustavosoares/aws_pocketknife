@@ -14,6 +14,8 @@ require 'aws_pocketknife/elb'
 require 'aws_pocketknife/rds'
 
 require 'aws_pocketknife/cli/iam'
+require 'aws_pocketknife/cli/asg'
+require 'aws_pocketknife/cli/elb'
 require 'aws_pocketknife/cli/ec2'
 require 'aws_pocketknife/cli/ami'
 require 'aws_pocketknife/cli/eb'
