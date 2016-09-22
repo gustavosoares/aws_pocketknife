@@ -6,6 +6,8 @@ module AwsPocketknife
     class << self
       include AwsPocketknife::Common::Utils
 
+      Logging = Common::Logging.logger
+
       def list_hosted_zones
         result = route53_client.list_hosted_zones
         unless result.nil?
@@ -29,8 +31,8 @@ module AwsPocketknife
                                    record_name: origin_dns_name,
                                    record_type: record_type)
 
-        if origin_record.length == 0
-          puts "Could not find record for #{origin_dns_name} at #{origin_hosted_zone}"
+        if origin_record.empty?
+          Logging.warn "Could not find record for #{origin_dns_name} at #{origin_hosted_zone}"
         end
         return hosted_zone_id, origin_record
       end
@@ -64,8 +66,7 @@ module AwsPocketknife
       end
 
       def get_payload_for_record_update(change: "", hosted_zone_id: "")
-
-        payload = {
+        {
             hosted_zone_id: hosted_zone_id,
             change_batch: {
                 comment: "",
@@ -133,10 +134,10 @@ module AwsPocketknife
         origin_record = origin_record[0]
 
         if not origin_record.alias_target.nil? and new_dns_name == origin_record.alias_target.dns_name
-          puts "Origin and destiny alias_target.dns_name are the same: #{new_dns_name} Aborting..."
+          Logging.info "Origin and destiny alias_target.dns_name are the same: #{new_dns_name} Aborting..."
           return false
         elsif origin_record.resource_records.length != 0 and new_dns_name == origin_record.resource_records[0].value
-          puts "Origin and destiny alias_target.dns_name are the same: #{new_dns_name} Aborting..."
+          Loggin.info "Origin and destiny alias_target.dns_name are the same: #{new_dns_name} Aborting..."
           return false
         end
 
@@ -173,13 +174,13 @@ module AwsPocketknife
                                     record_name: destiny_dns_name,
                                     record_type: record_type)
 
-        if destiny_record.length == 0
-          puts "Could not find destiny record for #{destiny_dns_name} at #{destiny_hosted_zone}"
+        if destiny_record.empty?
+          Logging.warn "Could not find destiny record for #{destiny_dns_name} at #{destiny_hosted_zone}"
           return nil
         end
 
         if destiny_record[0].alias_target.nil?
-          puts "DNS #{destiny_dns_name} is invalid"
+          Logging.warn "DNS #{destiny_dns_name} is invalid"
           return nil
         end
 
@@ -188,15 +189,15 @@ module AwsPocketknife
         origin_record = origin_record[0]
 
         unless new_dns_name.start_with?("dualstack.")
-          puts "Adding dualstack. to #{new_dns_name}"
+          Logging.info "Adding dualstack. to #{new_dns_name}"
           new_dns_name = "dualstack." + new_dns_name
         end
 
         if not origin_record.alias_target.nil? and new_dns_name == origin_record.alias_target.dns_name
-          puts "Origin dns and destiny alias_target.dns_name points to the same record: #{new_dns_name}\nAborting..."
+          Logging.info "Origin dns and destiny alias_target.dns_name points to the same record: #{new_dns_name}\nAborting..."
           return false
         elsif origin_record.resource_records.length != 0 and new_dns_name == origin_record.resource_records[0].value
-          puts "Origin dns and destiny alias_target.dns_name points to the same record: #{new_dns_name}\nAborting..."
+          Logging.info "Origin dns and destiny alias_target.dns_name points to the same record: #{new_dns_name}\nAborting..."
           return false
         end
 

@@ -12,7 +12,7 @@ module AwsPocketknife
                                                   page_size: 1,
                                               })
 
-        if resp.nil? or resp.load_balancer_descriptions.length == 0
+        if resp.nil? or resp.load_balancer_descriptions.empty?
           return nil
         else
           return resp.load_balancer_descriptions.first
