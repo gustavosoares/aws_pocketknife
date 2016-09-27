@@ -82,12 +82,7 @@ Commands:
   pocketknife rds snapshot SUBCOMMAND ...ARGS  # snapshot command lines
 
 
-$ pocketknife rds snapshot
-Commands:
-  pocketknife rds_snapshot clean DB_NAME DAYS --dry_run  # Remove manual snapshots with creation time lower than DAYS for database_name.
-  pocketknife rds_snapshot create DB_NAME                # Creates a snapshot for database_name.
-  pocketknife rds_snapshot help [COMMAND]                # Describe subcommands or one specific subcommand
-  pocketknife rds_snapshot list_snapshots DB_NAME        # list snapshots
+
 ```
 
 ### Elastic beanstalk
