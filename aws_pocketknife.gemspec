@@ -10,18 +10,13 @@ Gem::Specification.new do |spec|
   spec.email         = ["gustavo.soares@myob.com"]
 
   spec.summary       = "Command line tools to make aws administration a little bit easier and quicker than using the aws console."
-  spec.description   = "Command line tools to make aws administration a little bit easier and quicker than using the aws console. These commands are also handy if you have multiple aws accounts to manage, since you can't have multiple tabs open for
+  spec.description   = "Command line tools to make aws administration a little bit easier and quicker than using the aws console. It also helps to script some AWS tasks such as cleaning up
+old AMIs along its snapshots or cleaning up manual RDS snapshots or even creating a manual snapshot for a particular RDS.
+
+These commands are also handy if you have multiple aws accounts to manage, since you can't have multiple tabs open for
 different accounts in a web browser. The only way would be to use diffente browsers or open incognito windows."
   spec.homepage      = "https://github.com/MYOB-Technology/aws_pocketknife"
   spec.license       = "MIT"
-
-  # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
-  # delete this section to allow pushing this gem to any host.
-  if spec.respond_to?(:metadata)
-    spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
-  else
-    raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
-  end
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"
