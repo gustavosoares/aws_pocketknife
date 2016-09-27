@@ -2,48 +2,14 @@
 
 # Aws Pocketknife
 
-Command line tools to make aws administration a little bit easier and quicker than using the aws console. 
+Command line tools to make aws administration a little bit easier and quicker than using the aws console. It also helps to script some AWS tasks such as cleaning up
+old AMIs along its snapshots or cleaning up manual RDS snapshots or even creating a manual snapshot for a particular RDS.
+
 These commands are also handy if you have multiple aws accounts to manage, since you can't have multiple tabs open for
 different accounts in a web browser. The only way would be to use diffente browsers or open incognito windows.
 
 The aws cli allows you to setup profiles for each account. (see http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles) 
 After creating the profiles, you just export the environment variable AWS_PROFILE to specify the account you wish to use.
-
-## Setup local environment
-
-To run and/or test the gem locally you need to export the following environment variables
-
-### Windows
-
-    - Install ruby 2.2.x. in your local environment (http://rubyinstaller.org/downloads/)
-    - Download Development kit for Ruby 2.0 and above (same link as above) and extract it somewhere permanent. Then cd to it, run ruby dk.rb init and ruby dk.rb install to bind it to ruby installations in your path.
-    
-```
-set AWS_ACCESS_KEY_ID=[YOUR AWS ACCESS KEY]
-set AWS_REGION=ap-southeast-2
-set AWS_SECRET_ACCESS_KEY=[YOUR AWS SECRET KEY]
-set SSL_CERT_FILE=[PATH TO CRT FILE]
-```
-
-    
-### Linux
-
-Install rvm, then install ruby and create a gemset.
-
-```
-rvm install ruby-2.2.3
-rvm use ruby-2.2.3
-rvm gemset create aws-pocketknife
-rvm gemset use aws-pocketknife
-
-gem install bundler
-
-bundle install
-
-export AWS_REGION=ap-southeast-2
-export AWS_ACCESS_KEY_ID=
-export AWS_SECRET_ACCESS_KEY=
-export SSL_CERT_FILE=certs/ca-bundle.crt
 ```
 
 
@@ -51,7 +17,7 @@ export SSL_CERT_FILE=certs/ca-bundle.crt
 
 Add this line to your application's Gemfile:
 
-```ruby
+```
 gem 'aws_pocketknife'
 ```
 
@@ -94,6 +60,45 @@ Commands:
   pocketknife ec2 start INSTANCE_ID                    # start ec2 instance
   pocketknife ec2 stop INSTANCE_ID                     # stop ec2 instance
 
+```
+
+### AMI
+
+```
+$ pocketknife ami
+Commands:
+  pocketknife ami clean AMI_NAME_PATTERN DAYS --dry_run  # Given a name or filter (i.e, test-*), this command will delete all matched AMIs (and associated snapshots) with creation time lower than DAYS.
+  pocketknife ami help [COMMAND]                         # Describe subcommands or one specific subcommand
+  pocketknife ami share IMAGE_ID ACCOUNT_ID              # share the IMAGE_ID with the specified ACCOUNT_ID                 # stop ec2 instance
+
+```
+
+### RDS
+
+```
+$ pocketknife rds
+Commands:
+  pocketknife rds help [COMMAND]               # Describe subcommands or one specific subcommand
+  pocketknife rds snapshot SUBCOMMAND ...ARGS  # snapshot command lines
+
+
+$ pocketknife rds snapshot
+Commands:
+  pocketknife rds_snapshot clean DB_NAME DAYS --dry_run  # Remove manual snapshots with creation time lower than DAYS for database_name.
+  pocketknife rds_snapshot create DB_NAME                # Creates a snapshot for database_name.
+  pocketknife rds_snapshot help [COMMAND]                # Describe subcommands or one specific subcommand
+  pocketknife rds_snapshot list_snapshots DB_NAME        # list snapshots
+```
+
+### Elastic beanstalk
+
+```
+$ pocketknife eb
+Commands:
+  pocketknife eb desc ENVIRONMENT_NAME  # describe environment name
+  pocketknife eb help [COMMAND]         # Describe subcommands or one specific subcommand
+  pocketknife eb list                   # list environments
+  pocketknife eb vars NAME              # list environment variables for the specified elastic beanstalk environment name
 ```
 
 ## Development
