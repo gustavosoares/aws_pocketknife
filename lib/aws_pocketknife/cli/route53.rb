@@ -51,6 +51,42 @@ module AwsPocketknife
         end
       end
 
+      desc "get_record HOSTED_ZONE RECORD_NAME --record_type", "Get record for hosted zone."
+      #option :record_type, :type => :string, :default => 'A', :desc => 'Record type accepts SOA, A, TXT, NS, CNAME, MX, PTR, SRV, SPF, AAAA. Default to A'
+      def get_record(hosted_zone, record_name, record_type='A')
+
+        #record_type = options.fetch("record_type", 'A')
+        records = AwsPocketknife::Route53.get_record(hosted_zone_name: hosted_zone,
+                                                     record_name:record_name,
+                                                     record_type: record_type)
+        headers = ["Name", "Type", "DNS Name"]
+        data = []
+        if records.length > 0
+          records.each do |record|
+            if record.type == 'CNAME'
+              data << [record.name, record.type, record.resource_records[0].value]
+            else
+              data << [record.name, record.type, record.alias_target.dns_name]
+            end
+          end
+          AwsPocketknife::Route53.pretty_table(headers: headers, data: data)
+        else
+          puts "Record #{record_name} not found in hosted zone #{hosted_zone}"
+        end
+      end
+
+      desc "update_record HOSTED_ZONE ORIGIN_DNS_NAME DESTINY_RECORD_NAME DESTINY_HOSTED_ZONE RECORD_TYPE (default to A)", "Update a dns record from an existing dns entry."
+      def update_record(hosted_zone, origin_dns_name, destiny_record_name, destiny_hosted_zone, record_type='A')
+
+        AwsPocketknife::Route53.update_record(origin_hosted_zone: hosted_zone,
+                                              origin_dns_name: origin_dns_name,
+                                              record_type: record_type,
+                                              destiny_dns_name: destiny_record_name,
+                                              destiny_hosted_zone: destiny_hosted_zone
+        )
+
+      end
+
     end
   end
 end
