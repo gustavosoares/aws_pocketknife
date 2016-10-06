@@ -10,8 +10,6 @@ different accounts in a web browser. The only way would be to use diffente brows
 
 The aws cli allows you to setup profiles for each account. (see http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles) 
 After creating the profiles, you just export the environment variable AWS_PROFILE to specify the account you wish to use.
-```
-
 
 ## Installation
 
@@ -81,8 +79,6 @@ Commands:
   pocketknife rds help [COMMAND]               # Describe subcommands or one specific subcommand
   pocketknife rds snapshot SUBCOMMAND ...ARGS  # snapshot command lines
 
-
-
 ```
 
 ### Elastic beanstalk
@@ -96,6 +92,19 @@ Commands:
   pocketknife eb vars NAME              # list environment variables for the specified elastic beanstalk environment name
 ```
 
+### Route53
+
+```
+$ pocketknife route53
+Commands:
+  pocketknife route53 describe_hosted_zone HOSTED_ZONE                                                                              # describe hosted zone
+  pocketknife route53 get_record HOSTED_ZONE RECORD_NAME --record_type                                                              # Get record for hosted zone.
+  pocketknife route53 help [COMMAND]                                                                                                # Describe subcommands or one specific subcommand
+  pocketknife route53 list                                                                                                          # list hosted zones
+  pocketknife route53 list_records HOSTED_ZONE                                                                                      # list records for hosted zone
+  pocketknife route53 update_record HOSTED_ZONE ORIGIN_DNS_NAME DESTINY_RECORD_NAME DESTINY_HOSTED_ZONE RECORD_TYPE (default to A)  # Update a dns record from an existing dns entry.
+```
+
 ## Development
 
 
@@ -103,6 +112,9 @@ Commands:
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/MYOB-Technology/aws_pocketknife. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
+   * Fork it
+   * Make you changes
+   * Submit a pull request
 
 ## License
 
