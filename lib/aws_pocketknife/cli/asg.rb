@@ -13,8 +13,12 @@ module AwsPocketknife
 
       desc "desc ASG_NAME", "describe autoscaling group name"
       def desc(asg_name)
-        asgs = AwsPocketknife::Asg.describe_asg_by_name(name: asg_name)
-        print_asg(asgs: asgs)
+        asg = AwsPocketknife::Asg.describe_asg_by_name(name: asg_name)
+        if asg.auto_scaling_groups.empty?
+          puts "ASG #{asg_name} not found"
+        else
+          AwsPocketknife::Asg.nice_print(object: asg.to_h)
+        end
       end
 
       private

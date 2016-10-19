@@ -25,10 +25,9 @@ describe AwsPocketknife::Asg do
                                                                 auto_scaling_group_names: asg_list,
                                                             }).and_return(aws_response)
 
-      asgs = subject.describe_asg_by_name(name: asg_name)
+      asg = subject.describe_asg_by_name(name: asg_name)
 
-      expect(asgs.length).to eq(1)
-      expect(asgs[0].auto_scaling_group_name).to eq(asg_name)
+      expect(asg.auto_scaling_groups.first.auto_scaling_group_name).to eq(asg_name)
 
     end
 
@@ -44,10 +43,9 @@ describe AwsPocketknife::Asg do
                                                                         auto_scaling_group_names: asg_list,
                                                                     }).and_return(aws_response)
 
-      asgs = subject.describe_asg_by_name(name: asg_name)
+      asg = subject.describe_asg_by_name(name: asg_name)
 
-      expect(asgs.length).to eq(0)
-      expect(asgs).to eq([])
+      expect(asg.auto_scaling_groups.empty?).to eq(true)
 
     end
 

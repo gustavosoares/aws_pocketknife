@@ -9,15 +9,8 @@ module AwsPocketknife
       include AwsPocketknife::Common::Utils
 
       def describe_asg_by_name(name: "")
-        asgs = []
         asg_list = name.split(";")
-        resp = asg_client.describe_auto_scaling_groups({
-                                         auto_scaling_group_names: asg_list,
-                               })
-        resp.auto_scaling_groups.each do |asg|
-          asgs << asg
-        end
-        asgs
+        asg_client.describe_auto_scaling_groups({auto_scaling_group_names: asg_list, })
       end
 
       def list(max_records: 100)
