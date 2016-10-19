@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Gustavo Soares Souza"]
   spec.email         = ["gustavo.soares@myob.com"]
 
-  spec.summary       = "Command line tools to make aws administration a little bit easier and quicker than using the aws console."
-  spec.description   = "Command line tools to make aws administration a little bit easier and quicker than using the aws console. It also helps to script some AWS tasks such as cleaning up
+  spec.summary       = "Command line tools to make aws administration a little bit easier and faster than using the aws consol or aws cli."
+  spec.description   = "Have you ever find yourself going through the aws cli documentation page over and over again just to remember the right syntax or argument(s) for that command that you wanna run? Do you feel that you are more productive from the command line? Are you tired of having to open private browser windows or even a different browser to work with multiple aws accounts? AWS Pocketknife is a command line tool to make aws administration a little bit easier and faster than using the aws console or aws cli. It also helps to script some AWS tasks such as cleaning up
 old AMIs along its snapshots or cleaning up manual RDS snapshots or even creating a manual snapshot for a particular RDS.
 
 These commands are also handy if you have multiple aws accounts to manage, since you can't have multiple tabs open for
