@@ -1,4 +1,5 @@
 ![Build Status](https://travis-ci.org/MYOB-Technology/aws_pocketknife.svg?branch=master)
+[![Gem Version](https://badge.fury.io/rb/aws_pocketknife.svg)](https://badge.fury.io/rb/aws_pocketknife)
 
 # Aws Pocketknife
 
