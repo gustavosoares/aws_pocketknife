@@ -5,7 +5,7 @@ module AwsPocketknife
   module Cli
     class RdsSnapshot < Thor
 
-      desc "list_snapshots DB_NAME", "list snapshots"
+      desc "list DB_NAME", "list snapshots for a given database name."
       def list(db_name)
         snapshots = AwsPocketknife::Rds.describe_snapshots(db_name: db_name)
         headers = [ 'Name', 'Creation Time', 'Snapshot Type', 'Status','Port', 'Engine', 'Version', 'Storage (Gb)', 'IOPS']
@@ -34,7 +34,7 @@ module AwsPocketknife
                                             dry_run: dry_run
       end
 
-      desc "create DB_NAME", "Creates a snapshot for database_name."
+      desc "create DB_NAME", "Creates a snapshot for database name."
       def create(db_name)
         AwsPocketknife::Rds.create_snapshot db_name: db_name
       end
