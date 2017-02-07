@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = "aws_pocketknife"
   spec.version       = AwsPocketknife::VERSION
   spec.authors       = ["Gustavo Soares Souza"]
-  spec.email         = ["gustavo.soares@myob.com"]
+  spec.email         = ["gustavosoares@gmail.com"]
 
   spec.summary       = "Command line tools to make aws administration a little bit easier and faster than using the aws consol or aws cli."
   spec.description   = "Have you ever find yourself going through the aws cli documentation page over and over again just to remember the right syntax or argument(s) for that command that you wanna run? Do you feel that you are more productive from the command line? Are you tired of having to open private browser windows or even a different browser to work with multiple aws accounts? AWS Pocketknife is a command line tool to make aws administration a little bit easier and faster than using the aws console or aws cli. It also helps to script some AWS tasks such as cleaning up
