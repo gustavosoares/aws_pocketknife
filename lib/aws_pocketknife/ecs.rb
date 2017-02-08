@@ -37,11 +37,27 @@ module AwsPocketknife
           cluster_map[:info] = info
           clusters_list << cluster_map
         end
-
         return clusters_list
-
       end
 
+      def describe_services(name: '', cluster: '')
+        ecs_client.describe_services({cluster: cluster, services: [name]}).services.first
+      end
+        
+      def list_services(cluster: '', max_results: 50)
+        services_list = []
+        services = ecs_client.list_services({max_results: max_results,
+                                            cluster: cluster,
+                              }).service_arns
+        services.each do |service|
+          service_map = {}
+          service_map[:name] = service.split('/')[1]
+          info = describe_services name: service, cluster: cluster
+          service_map[:info] = info
+          services_list << service_map          
+        end
+        return services_list
+      end
     end
 
   end
