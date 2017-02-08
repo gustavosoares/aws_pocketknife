@@ -6,6 +6,7 @@ require 'aws_pocketknife/common/logging'
 
 require 'aws_pocketknife/iam'
 require 'aws_pocketknife/ec2'
+require 'aws_pocketknife/ecs'
 require 'aws_pocketknife/route53'
 require 'aws_pocketknife/asg'
 require 'aws_pocketknife/cloudwatch_logs'
@@ -17,6 +18,7 @@ require 'aws_pocketknife/cli/iam'
 require 'aws_pocketknife/cli/asg'
 require 'aws_pocketknife/cli/elb'
 require 'aws_pocketknife/cli/ec2'
+require 'aws_pocketknife/cli/ecs'
 require 'aws_pocketknife/cli/ami'
 require 'aws_pocketknife/cli/eb'
 require 'aws_pocketknife/cli/route53'
@@ -27,7 +29,7 @@ require 'aws_pocketknife/cli/main'
 module AwsPocketknife
   extend self
 
-  AWS_REGION = ENV['AWS_REGION'] || 'ap-southeast-2'
+  AWS_REGION = ENV['AWS_REGION'] || 'us-west-2'
   AWS_PROFILE = ENV['AWS_PROFILE'] || nil
 
   class << self
@@ -66,6 +68,10 @@ module AwsPocketknife
 
     def ec2_client
       @ec2_client ||= Aws::EC2::Client.new(get_client_options)
+    end
+
+    def ecs_client
+      @ecs_client ||= Aws::ECS::Client.new(get_client_options)
     end
 
     def route53_client

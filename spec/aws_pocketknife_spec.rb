@@ -9,7 +9,7 @@ describe AwsPocketknife do
 
   it 'should use default region when env var is unset' do
     ENV['AWS_REGION'] = ""
-    expect(AwsPocketknife::AWS_REGION).to eq("ap-southeast-2")
+    expect(AwsPocketknife::AWS_REGION).to eq("us-west-2")
   end
 
 end

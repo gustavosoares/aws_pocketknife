@@ -29,6 +29,9 @@ module AwsPocketknife
       desc "elb SUBCOMMAND ...ARGS", "elb command lines"
       subcommand "elb", AwsPocketknife::Cli::Elb
 
+      desc "ecs SUBCOMMAND ...ARGS", "ecs command lines"
+      subcommand "ecs", AwsPocketknife::Cli::Ecs
+
     end
   end
 end

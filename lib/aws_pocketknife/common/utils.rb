@@ -11,6 +11,10 @@ module AwsPocketknife
         @ec2_client ||= AwsPocketknife.ec2_client
       end
 
+      def ecs_client
+        @ecs_client ||= AwsPocketknife.ecs_client
+      end
+
       def iam_client
         @iam_client ||= AwsPocketknife.iam_client
       end
