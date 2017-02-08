@@ -46,10 +46,22 @@ module AwsPocketknife
         
       def list_services(cluster: '', max_results: 50)
         services_list = []
-        services = ecs_client.list_services({max_results: max_results,
-                                            cluster: cluster,
-                              }).service_arns
-        services.each do |service|
+        responses = []
+
+        services = get_services max_results: max_results, cluster: cluster
+        responses << services.service_arns
+        next_token = services.next_token
+
+        while true
+          break if next_token.nil? or next_token.empty?
+          resp = get_services(next_token: next_token, max_results: max_results, cluster: cluster)
+          responses << services.service_arns
+          next_token = resp.next_token
+        end
+
+        responses.flatten!
+
+        responses.each do |service|
           service_map = {}
           service_map[:name] = service.split('/')[1]
           info = describe_services name: service, cluster: cluster
@@ -58,6 +70,15 @@ module AwsPocketknife
         end
         return services_list
       end
+
+      def get_services(next_token: "", max_results: 100, cluster: '')
+        ecs_client.list_services({
+            max_results: max_results,
+            cluster: cluster,
+            next_token: next_token,
+        })
+      end
+
     end
 
   end
