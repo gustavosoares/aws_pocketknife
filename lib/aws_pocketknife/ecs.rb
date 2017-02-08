@@ -24,21 +24,23 @@ module AwsPocketknife
       Logging = Common::Logging.logger
 
       def describe_clusters(name: '')
-        ecs_client.describe_clusters({dry_run: false,
-                                    clusters: [
-                                      "", 
-                                    ], 
-                                    })
+        ecs_client.describe_clusters({clusters: [name]}).clusters.first
       end
 
       def list_clusters(max_results: 50)
+        clusters_list = []
         clusters = ecs_client.list_clusters({max_results: max_results,}).cluster_arns
+        clusters.each do |cluster|
+          cluster_map = {}
+          cluster_map[:name] = cluster.split('/')[1]
+          info = describe_clusters name: cluster
+          cluster_map[:info] = info
+          clusters_list << cluster_map
+        end
 
-        puts clusters
+        return clusters_list
 
-        return clusters
       end
-
 
     end
 
