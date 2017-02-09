@@ -29,8 +29,22 @@ module AwsPocketknife
 
       def list_clusters(max_results: 50)
         clusters_list = []
-        clusters = ecs_client.list_clusters({max_results: max_results,}).cluster_arns
-        clusters.each do |cluster|
+        responses = []
+
+        clusters = get_clusters max_results: max_results
+        responses << clusters.cluster_arns
+        next_token = clusters.next_token
+
+        while true
+          break if next_token.nil? or next_token.empty?
+          resp = get_clusters(next_token: next_token, max_results: max_results)
+          responses << clusters.cluster_arns
+          next_token = resp.next_token
+        end
+
+        responses.flatten!
+
+        responses.each do |cluster|
           cluster_map = {}
           cluster_map[:name] = cluster.split('/')[1]
           info = describe_clusters name: cluster
@@ -76,6 +90,13 @@ module AwsPocketknife
             max_results: max_results,
             cluster: cluster,
             next_token: next_token,
+        })
+      end
+
+      def get_clusters(next_token: "", max_results: 100)
+        ecs_client.list_clusters({
+            max_results: max_results,
+            next_token: next_token
         })
       end
 
