@@ -23,6 +23,40 @@ module AwsPocketknife
 
       Logging = Common::Logging.logger
 
+      def describe_container_instances(name: '', container: '')
+        ecs_client.describe_container_instances({cluster: name, container_instances: [container]}).container_instances.first
+      end
+
+      # list container instances
+      def list_container_instances(cluster: '', max_results: 50)
+        containers_list = []
+        responses = []
+
+        containers = get_containers max_results: max_results
+        responses << containers.container_instance_arns
+        next_token = containers.next_token
+
+        while true
+          break if next_token.nil? or next_token.empty?
+          resp = get_containers(cluster: cluster, next_token: next_token, max_results: max_results)
+          responses << resp.container_instance_arns
+          next_token = resp.next_token
+        end
+
+        responses.flatten!
+
+        responses.each do |container|
+          container_map = {}
+          container_map[:name] = container.split('/')[1]
+          info = describe_containers name: cluster, container: container
+          container_map[:info] = info
+          container_list << container_map
+        end
+        return container_list
+      end
+
+      # clusters
+
       def describe_clusters(name: '')
         ecs_client.describe_clusters({clusters: [name]}).clusters.first
       end
@@ -96,6 +130,14 @@ module AwsPocketknife
       def get_clusters(next_token: "", max_results: 100)
         ecs_client.list_clusters({
             max_results: max_results,
+            next_token: next_token
+        })
+      end
+
+      def get_containers(cluster: "", next_token: "", max_results: 100)
+        ecs_client.list_container_instances({
+            max_results: max_results,
+            cluster: cluster,
             next_token: next_token
         })
       end
