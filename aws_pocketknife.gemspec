@@ -15,7 +15,7 @@ old AMIs along its snapshots or cleaning up manual RDS snapshots or even creatin
 
 These commands are also handy if you have multiple aws accounts to manage, since you can't have multiple tabs open for
 different accounts in a web browser. The only way would be to use diffente browsers or open incognito windows."
-  spec.homepage      = "https://github.com/MYOB-Technology/aws_pocketknife"
+  spec.homepage      = "https://github.com/gustavosoares/aws_pocketknife"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }

@@ -38,7 +38,7 @@ module AwsPocketknife
         while true
           break if next_token.nil? or next_token.empty?
           resp = get_clusters(next_token: next_token, max_results: max_results)
-          responses << clusters.cluster_arns
+          responses << resp.cluster_arns
           next_token = resp.next_token
         end
 
@@ -69,7 +69,7 @@ module AwsPocketknife
         while true
           break if next_token.nil? or next_token.empty?
           resp = get_services(next_token: next_token, max_results: max_results, cluster: cluster)
-          responses << services.service_arns
+          responses << resp.service_arns
           next_token = resp.next_token
         end
 
