@@ -112,6 +112,15 @@ Commands:
   pocketknife route53 update_record HOSTED_ZONE ORIGIN_DNS_NAME DESTINY_RECORD_NAME DESTINY_HOSTED_ZONE RECORD_TYPE (default to A)  # Update a dns record from an existing dns entry.
 ```
 
+### ECS
+
+```
+Commands:
+  pocketknife ecs help [COMMAND]              # Describe subcommands or one specific subcommand
+  pocketknife ecs list_clusters               # list clustes
+  pocketknife ecs list_services CLUSTER_NAME  # list services for a given cluster
+```
+
 ## Development
 
 
