@@ -19,7 +19,6 @@ module AwsPocketknife
 
     class << self
       include AwsPocketknife::Common::Utils
-      #include AwsPocketknife::Common::Logging
 
       Logging = Common::Logging.logger
 
@@ -32,7 +31,7 @@ module AwsPocketknife
         containers_list = []
         responses = []
 
-        containers = get_containers max_results: max_results
+        containers = get_containers cluster: cluster, max_results: max_results
         responses << containers.container_instance_arns
         next_token = containers.next_token
 
@@ -52,7 +51,7 @@ module AwsPocketknife
           container_map[:info] = info
           containers_list << container_map
         end
-        return container_list
+        return containers_list
       end
 
       # clusters

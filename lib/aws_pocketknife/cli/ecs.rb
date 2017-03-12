@@ -44,6 +44,25 @@ module AwsPocketknife
           AwsPocketknife::Ecs.pretty_table(headers: headers, data: data)
         end
       end
+
+      desc "list_instances for CLUSTER_NAME", "list instances for a given cluster"
+      def list_instances(cluster)
+        instances = AwsPocketknife::Ecs.list_container_instances cluster: cluster
+        headers = ["name", "ec2_instance_id", "pending_tasks_count","running_tasks_count", 
+        "status"]
+        data = []
+        if instances.nil?
+          puts "No instances found"
+        else
+          instances.each do |instance|
+            info = instance[:info]
+            data << [instance[:name], info.ec2_instance_id, info.pending_tasks_count,
+                    info.running_tasks_count, info.status
+            ]
+          end
+          AwsPocketknife::Ecs.pretty_table(headers: headers, data: data)
+        end
+      end      
     end
   end
 end
