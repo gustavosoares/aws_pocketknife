@@ -1,4 +1,4 @@
-![Build Status](https://travis-ci.org/MYOB-Technology/aws_pocketknife.svg?branch=master)
+![Build Status](https://travis-ci.org/gustavosoares/aws_pocketknife.svg?branch=master)
 [![Gem Version](https://badge.fury.io/rb/aws_pocketknife.svg)](https://badge.fury.io/rb/aws_pocketknife)
 
 # Aws Pocketknife
@@ -33,7 +33,7 @@ And then execute:
 Or install it yourself as:
 
 ```
-git clone https://github.com/MYOB-Technology/aws_pocketknife.git
+git clone https://github.com/gustavosoares/aws_pocketknife.git
 bundle install
 rake install
 ```
@@ -116,9 +116,10 @@ Commands:
 
 ```
 Commands:
-  pocketknife ecs help [COMMAND]              # Describe subcommands or one specific subcommand
-  pocketknife ecs list_clusters               # list clustes
-  pocketknife ecs list_services CLUSTER_NAME  # list services for a given cluster
+  pocketknife ecs help [COMMAND]                   # Describe subcommands or one specific subcommand
+  pocketknife ecs list_clusters                    # list clustes
+  pocketknife ecs list_instances for CLUSTER_NAME  # list instances for a given cluster
+  pocketknife ecs list_services CLUSTER_NAME       # list services for a given cluster
 ```
 
 ## Development
@@ -126,7 +127,7 @@ Commands:
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/MYOB-Technology/aws_pocketknife. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
    * Fork it
    * Make you changes
