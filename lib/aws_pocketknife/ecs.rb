@@ -23,8 +23,8 @@ module AwsPocketknife
 
       Logging = Common::Logging.logger
 
-      def describe_container_instances(name: '', container: '')
-        ecs_client.describe_container_instances({cluster: name, container_instances: [container]}).container_instances.first
+      def describe_container_instances(cluster: '', container: '')
+        ecs_client.describe_container_instances({cluster: cluster, container_instances: [container]}).container_instances.first
       end
 
       # list container instances
@@ -48,9 +48,9 @@ module AwsPocketknife
         responses.each do |container|
           container_map = {}
           container_map[:name] = container.split('/')[1]
-          info = describe_containers name: cluster, container: container
+          info = describe_container_instances cluster: cluster, container: container
           container_map[:info] = info
-          container_list << container_map
+          containers_list << container_map
         end
         return container_list
       end
