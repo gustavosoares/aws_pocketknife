@@ -14,6 +14,11 @@ module AwsPocketknife
                                       dry_run: dry_run
       end
 
+      desc "delete_by_id AMI_ID ", "Deletes the ami id."
+      def delete_by_id(id)
+        AwsPocketknife::Ec2.delete_ami_by_id id: id
+      end
+
       desc "share IMAGE_ID ACCOUNT_ID", "share the IMAGE_ID with the specified ACCOUNT_ID"
       def share(image_id, account_id)
         AwsPocketknife::Ec2.share_ami(image_id: image_id, user_id: account_id)

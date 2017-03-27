@@ -39,6 +39,7 @@ module AwsPocketknife
       end
 
       def delete_ami_by_id(id: '')
+        Logging.info "deleting image #{id}"
         image = find_ami_by_id(id: id)
         snapshot_ids = snapshot_ids(image)
         ec2_client.deregister_image(image_id: id)
@@ -82,7 +83,6 @@ module AwsPocketknife
 
         unless dry_run
           images_to_delete.each do |image_id|
-            Logging.info "deleting image #{image_id}"
             delete_ami_by_id(id: image_id)
           end
         end
