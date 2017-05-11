@@ -45,8 +45,8 @@ module AwsPocketknife
                     info.deployment_configuration.maximum_percent, info.deployment_configuration.minimum_healthy_percent,
                     task_def.cpu, task_def.memory, task_def.memory_reservation
             ]
-            cpu_total = cpu_total + task_def.cpu
-            mem_total = mem_total + task_def.memory
+            cpu_total = cpu_total + task_def.cpu unless task_def.cpu.nil?
+            mem_total = mem_total + task_def.memory unless task_def.memory.nil?
             mem_res_total = (mem_res_total + task_def.memory_reservation) unless task_def.memory_reservation.nil?
           end
           puts ""
