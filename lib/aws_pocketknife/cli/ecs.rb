@@ -29,19 +29,36 @@ module AwsPocketknife
       def list_services(cluster)
         services = AwsPocketknife::Ecs.list_services cluster: cluster
         headers = ["name", "status", "desired_count","running_count", 
-        "pending_count", "task_definition", "maximum_percent", "minimum_healthy_percent"]
+        "pending_count", "task_definition", "maximum_percent", "minimum_healthy_percent", "cpu (units)", "mem (MiB)", "mem_reservation (MiB)"]
         data = []
         if services.nil?
           puts "No service found"
         else
+          mem_total = 0
+          mem_res_total = 0
+          cpu_total = 0
           services.each do |service|
             info = service[:info]
+            task_def = service[:task_definition]
             data << [service[:name], info.status, info.desired_count,
                     info.running_count, info.pending_count, info.task_definition.split('/')[1],
-                    info.deployment_configuration.maximum_percent, info.deployment_configuration.minimum_healthy_percent
+                    info.deployment_configuration.maximum_percent, info.deployment_configuration.minimum_healthy_percent,
+                    task_def.cpu, task_def.memory, task_def.memory_reservation
             ]
+            cpu_total = cpu_total + task_def.cpu
+            mem_total = mem_total + task_def.memory
+            mem_res_total = (mem_res_total + task_def.memory_reservation) unless task_def.memory_reservation.nil?
           end
+          puts ""
+          puts "Memory is the hard limit (in MiB) of memory to present to the container. If your container attempts to exceed the memory specified here, the container is killed."
+          puts "Memory reservation is the soft limit (in MiB) of memory to reserve for the container. When system memory is under contention, Docker attempts to keep the container memory to this soft limit"
+          puts ""
           AwsPocketknife::Ecs.pretty_table(headers: headers, data: data)
+          puts ""
+          puts "CPU TOTAL: #{cpu_total} Units"
+          puts "MEM TOTAL: #{mem_total} MiB"
+          puts "MEM RES TOTAL: #{mem_res_total} MiB"
+          puts ""
         end
       end
 

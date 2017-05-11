@@ -87,6 +87,8 @@ module AwsPocketknife
         return clusters_list
       end
 
+      # services 
+
       def describe_services(name: '', cluster: '')
         ecs_client.describe_services({cluster: cluster, services: [name]}).services.first
       end
@@ -113,10 +115,20 @@ module AwsPocketknife
           service_map[:name] = service.split('/')[1]
           info = describe_services name: service, cluster: cluster
           service_map[:info] = info
+          service_map[:task_definition] = describe_task_definition task_definition: info.task_definition
           services_list << service_map          
         end
         return services_list
       end
+
+      # tasks-definitions
+
+      def describe_task_definition(task_definition: '')
+        resp = ecs_client.describe_task_definition({task_definition: task_definition})
+        return resp.task_definition.container_definitions.first
+      end
+
+      # helpers
 
       def get_services(next_token: "", max_results: 100, cluster: '')
         ecs_client.list_services({
