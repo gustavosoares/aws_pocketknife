@@ -116,10 +116,12 @@ Commands:
 
 ```
 Commands:
-  pocketknife ecs help [COMMAND]                   # Describe subcommands or one specific subcommand
-  pocketknife ecs list_clusters                    # list clustes
-  pocketknife ecs list_instances for CLUSTER_NAME  # list instances for a given cluster
-  pocketknife ecs list_services CLUSTER_NAME       # list services for a given cluster
+  pocketknife ecs clone_service CLUSTER_NAME, SERVICE_NAME  # creates a copy of an existing service
+  pocketknife ecs desc_service CLUSTER_NAME, SERVICE_NAME   # describe service for a given cluster
+  pocketknife ecs help [COMMAND]                            # Describe subcommands or one specific subcommand
+  pocketknife ecs list_clusters                             # list clustes
+  pocketknife ecs list_instances for CLUSTER_NAME           # list instances for a given cluster
+  pocketknife ecs list_services CLUSTER_NAME                # list services for a given cluster
 ```
 
 ## Development
