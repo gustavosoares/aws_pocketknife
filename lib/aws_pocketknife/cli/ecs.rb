@@ -62,6 +62,16 @@ module AwsPocketknife
         end
       end
 
+      desc "desc_service CLUSTER_NAME, SERVICE_NAME", "describe service for a given cluster"
+      def desc_service(cluster, service_name)
+        service = AwsPocketknife::Ecs.describe_services cluster: cluster, name: service_name
+        if service.nil?
+          puts "service #{service_name} not found"
+        else
+          AwsPocketknife::Ecs.nice_print(object: service.to_h)
+        end
+      end
+
       desc "list_instances for CLUSTER_NAME", "list instances for a given cluster"
       def list_instances(cluster)
         instances = AwsPocketknife::Ecs.list_container_instances cluster: cluster
