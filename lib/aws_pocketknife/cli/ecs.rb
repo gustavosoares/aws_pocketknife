@@ -72,6 +72,15 @@ module AwsPocketknife
         end
       end
 
+      desc "clone_service CLUSTER_NAME, SERVICE_NAME", "creates a copy of an existing service"
+      def clone_service(cluster, service_name)
+        resp = AwsPocketknife::Ecs.clone_service cluster: cluster, name: service_name
+        puts ""
+        puts "Response: "
+        puts ""
+        AwsPocketknife::Ecs.nice_print(object: resp.to_h)
+      end
+
       desc "list_instances for CLUSTER_NAME", "list instances for a given cluster"
       def list_instances(cluster)
         instances = AwsPocketknife::Ecs.list_container_instances cluster: cluster

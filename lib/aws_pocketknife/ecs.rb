@@ -2,6 +2,7 @@ require 'aws_pocketknife'
 require 'base64'
 require 'openssl'
 require 'retryable'
+require 'date'
 require 'recursive-open-struct'
 
 module AwsPocketknife
@@ -92,7 +93,32 @@ module AwsPocketknife
       def describe_services(name: '', cluster: '')
         ecs_client.describe_services({cluster: cluster, services: [name]}).services.first
       end
-        
+
+      def create_service(payload: {})
+        ecs_client.create_service(payload)
+      end
+
+      def clone_service(name: '', cluster: '')
+        d = DateTime.now
+        date_fmt = d.strftime("%d%m%Y_%H%M%S")
+        current_service = describe_services name: name, cluster: cluster
+        new_name = "#{name}-clone-#{date_fmt}"
+        payload = {
+          cluster: cluster,
+          service_name: new_name,
+          task_definition: current_service.task_definition,
+          load_balancers: current_service.load_balancers.to_a,
+          desired_count: current_service.desired_count,
+          role: current_service.role_arn,
+          deployment_configuration: current_service.deployment_configuration.to_h,
+          placement_constraints: current_service.placement_constraints.to_a,
+          placement_strategy: current_service.placement_strategy.to_a,
+        }
+        puts "Cloned service payload:"
+        AwsPocketknife::Ecs.nice_print(object: payload.to_h)
+        create_service payload: payload
+      end
+
       def list_services(cluster: '', max_results: 50)
         services_list = []
         responses = []
