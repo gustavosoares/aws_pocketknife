@@ -93,8 +93,8 @@ module AwsPocketknife
       end
 
       # container instance
-      desc "list_container_tasks CLUSTER_NAME, CONTAINER_NAME", "list tasks running in container (instance)"
-      def list_container_tasks(cluster, name)
+      desc "list_instance_tasks CLUSTER_NAME, CONTAINER_NAME", "list tasks running in container (instance)"
+      def list_instance_tasks(cluster, name)
         resp = AwsPocketknife::Ecs.list_container_tasks cluster: cluster, container_name: name
         headers = ["name", "started_at", "stopped_at", "last_status", "task"]
         data = []
@@ -121,6 +121,13 @@ module AwsPocketknife
         else
           instances.each do |instance|
             info = instance[:info]
+            # tasks = instance[:tasks]
+            # task_list = []
+            # unless tasks.empty?
+            #   tasks.tasks.each do |t|
+            #     task_list << t.task_definition_arn.split('/')[1]
+            #   end
+            # end
             cpu_total = info.registered_resources[0].integer_value
             mem_total = info.registered_resources[1].integer_value
             cpu_available = info.remaining_resources[0].integer_value
