@@ -1,4 +1,5 @@
 require "thor"
+require "colorize"
 require "aws_pocketknife"
 
 module AwsPocketknife
@@ -81,20 +82,28 @@ module AwsPocketknife
         AwsPocketknife::Ecs.nice_print(object: resp.to_h)
       end
 
-      desc "list_instances for CLUSTER_NAME", "list instances for a given cluster"
+      desc "list_instances CLUSTER_NAME", "list instances for a given cluster"
       def list_instances(cluster)
         instances = AwsPocketknife::Ecs.list_container_instances cluster: cluster
-        headers = ["name", "ec2_instance_id", "pending_tasks_count","running_tasks_count", 
-        "status"]
+        headers = ["name", "ec2_instance_id", "agent_connected",
+                  "pending_tasks_count","running_tasks_count", "status",
+                  "cpu_total", "cpu_available", "mem_total", "mem_available",
+                ]
         data = []
         if instances.nil?
           puts "No instances found"
         else
           instances.each do |instance|
             info = instance[:info]
-            data << [instance[:name], info.ec2_instance_id, info.pending_tasks_count,
-                    info.running_tasks_count, info.status
-            ]
+            cpu_total = info.registered_resources[0].integer_value
+            mem_total = info.registered_resources[1].integer_value
+            cpu_available = info.remaining_resources[0].integer_value
+            mem_available = info.remaining_resources[1].integer_value
+            connected = info.agent_connected
+            data << [instance[:name], info.ec2_instance_id, connected,
+              info.pending_tasks_count, info.running_tasks_count, info.status,
+              cpu_total, cpu_available, mem_total, mem_available
+            ]            
           end
           AwsPocketknife::Ecs.pretty_table(headers: headers, data: data)
         end
