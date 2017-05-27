@@ -92,6 +92,16 @@ module AwsPocketknife
         AwsPocketknife::Ecs.nice_print(object: resp.to_a)
       end
 
+      # container instance
+      desc "list_container_tasks CLUSTER_NAME, CONTAINER_NAME", "list tasks running in container (instance)"
+      def list_container_tasks(cluster, name)
+        resp = AwsPocketknife::Ecs.list_container_tasks cluster: cluster, container_name: name
+        puts ""
+        puts "Response: "
+        puts ""
+        AwsPocketknife::Ecs.nice_print(object: resp.to_a)
+      end
+
       desc "list_instances CLUSTER_NAME", "list instances for a given cluster"
       def list_instances(cluster)
         instances = AwsPocketknife::Ecs.list_container_instances cluster: cluster

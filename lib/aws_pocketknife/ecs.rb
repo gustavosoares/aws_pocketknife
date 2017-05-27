@@ -62,12 +62,18 @@ module AwsPocketknife
           task_list = []
           container_map[:name] = container.split('/')[1]
           info = describe_container_instances cluster: cluster, container: container
-          tasks = list_tasks cluster: cluster, container_instance: container_map[:name]
           container_map[:info] = info
-          container_map[:tasks] = describe_tasks(cluster: cluster, tasks: tasks)
+          container_map[:tasks] = list_container_tasks(cluster: cluster, container_name: container_map[:name])
           containers_list << container_map
         end
         return containers_list
+      end
+
+      # list tasks in container instance
+      def list_container_tasks(cluster: '', container_name: '')
+        tasks_list = []
+        tasks = list_tasks cluster: cluster, container_instance: container_name
+        describe_tasks(cluster: cluster, tasks: tasks)
       end
 
       # clusters
