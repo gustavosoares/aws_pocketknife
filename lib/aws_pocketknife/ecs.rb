@@ -23,6 +23,18 @@ module AwsPocketknife
 
       Logging = Common::Logging.logger
 
+      # container instance
+
+      # set a list of instances to draining. instances is a comma delimited string
+
+      def drain_instances(cluster: '', names: '')
+        ecs_client.update_container_instances_state({
+          cluster: cluster,
+          container_instances: names.split(';'), # required
+          status: "DRAINING", # required, accepts ACTIVE, DRAINING
+        })
+      end
+
       def describe_container_instances(cluster: '', container: '')
         ecs_client.describe_container_instances({cluster: cluster, container_instances: [container]}).container_instances.first
       end
@@ -47,9 +59,12 @@ module AwsPocketknife
 
         responses.each do |container|
           container_map = {}
+          task_list = []
           container_map[:name] = container.split('/')[1]
           info = describe_container_instances cluster: cluster, container: container
+          tasks = list_tasks cluster: cluster, container_instance: container_map[:name]
           container_map[:info] = info
+          container_map[:tasks] = describe_tasks(cluster: cluster, tasks: tasks)
           containers_list << container_map
         end
         return containers_list
@@ -152,6 +167,24 @@ module AwsPocketknife
       def describe_task_definition(task_definition: '')
         resp = ecs_client.describe_task_definition({task_definition: task_definition})
         return resp.task_definition.container_definitions.first
+      end
+
+      def list_tasks cluster: '', container_instance: ''
+        ecs_client.list_tasks({
+          cluster: cluster, 
+          container_instance: container_instance, 
+        }).task_arns
+      end
+
+      def describe_tasks cluster: '', tasks: []
+        if tasks.empty?
+          return []
+        else
+          return ecs_client.describe_tasks({
+            cluster: cluster,
+            tasks: tasks, 
+          })
+        end
       end
 
       # helpers

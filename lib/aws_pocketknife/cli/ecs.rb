@@ -82,12 +82,22 @@ module AwsPocketknife
         AwsPocketknife::Ecs.nice_print(object: resp.to_h)
       end
 
+      # container instance
+      desc "drain_instances CLUSTER_NAME, CONTAINERS", "drains containers associated to the ecs cluster. CONTAINERS can a be a string delimited list"
+      def drain_instances(cluster, names)
+        resp = AwsPocketknife::Ecs.drain_instances cluster: cluster, names: names
+        puts ""
+        puts "Response: "
+        puts ""
+        AwsPocketknife::Ecs.nice_print(object: resp.to_a)
+      end
+
       desc "list_instances CLUSTER_NAME", "list instances for a given cluster"
       def list_instances(cluster)
         instances = AwsPocketknife::Ecs.list_container_instances cluster: cluster
         headers = ["name", "ec2_instance_id", "agent_connected",
                   "pending_tasks_count","running_tasks_count", "status",
-                  "cpu_total", "cpu_available", "mem_total", "mem_available",
+                  "cpu (units)", "mem (MiB)"
                 ]
         data = []
         if instances.nil?
@@ -102,7 +112,7 @@ module AwsPocketknife
             connected = info.agent_connected
             data << [instance[:name], info.ec2_instance_id, connected,
               info.pending_tasks_count, info.running_tasks_count, info.status,
-              cpu_total, cpu_available, mem_total, mem_available
+              "#{cpu_available} / #{cpu_total}", "#{mem_available} / #{mem_total}"
             ]            
           end
           AwsPocketknife::Ecs.pretty_table(headers: headers, data: data)
