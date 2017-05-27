@@ -26,6 +26,7 @@ different accounts in a web browser. The only way would be to use diffente brows
   spec.add_dependency 'aws-sdk-core', '~> 2.1'
   spec.add_dependency 'retryable', '~> 2.0'
   spec.add_dependency "rake", "~> 10.0"
+  spec.add_dependency "colorize", "= 0.8.1"
   spec.add_dependency "erubis", "= 2.7.0"
   spec.add_dependency "pretty_table", "= 0.1.0"
   spec.add_dependency "awesome_print", "= 1.6.1"
