@@ -115,7 +115,7 @@ module AwsPocketknife
           temp_records << result.resource_record_sets
           is_truncated = result.is_truncated
         else
-          result = route53_client.list_resource_record_sets({hosted_zone_id: hosted_zone_id, max_items: max_items})
+          result = route53_client.list_resource_record_sets({hosted_zone_id: hosted_zone_id})
           temp_records << result.resource_record_sets
           is_truncated = result.is_truncated
         end
