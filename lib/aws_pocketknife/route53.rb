@@ -90,24 +90,47 @@ module AwsPocketknife
         return record
       end
 
-      def list_records_for_zone_name(hosted_zone_name: "", record_name: "", record_type: "")
+      def list_records(hosted_zone_id: "", record_name: "")
+          return route53_client.list_resource_record_sets({hosted_zone_id: hosted_zone_id,
+                                                      start_record_name: record_name,
+          })
+      end
+
+      def list_records_for_zone_name(hosted_zone_name: "", record_name: "", record_type: "", max_items: 100)
         records = []
+        temp_records = []
         hosted_zone = describe_hosted_zone(hosted_zone: hosted_zone_name)
         return records if hosted_zone.nil?
 
         hosted_zone_id = get_hosted_zone_id(hosted_zone: hosted_zone.id)
 
         result = nil
+        is_truncated = false
         if record_name.length != 0 and record_type != 0
           result = route53_client.list_resource_record_sets({hosted_zone_id: hosted_zone_id,
                                                       start_record_name: record_name,
                                                       start_record_type: record_type, # accepts SOA, A, TXT, NS, CNAME, MX, PTR, SRV, SPF, AAAA
                                                       max_items: 1,
                                                      })
+          temp_records << result.resource_record_sets
+          is_truncated = result.is_truncated
         else
-          result = route53_client.list_resource_record_sets({hosted_zone_id: hosted_zone_id})
+          result = route53_client.list_resource_record_sets({hosted_zone_id: hosted_zone_id, max_items: max_items})
+          temp_records << result.resource_record_sets
+          is_truncated = result.is_truncated
         end
-        result.resource_record_sets.each do |record|
+
+        # loop through chunk of records
+        while is_truncated
+          next_record_name = result.next_record_name
+          result = list_records(hosted_zone_id: hosted_zone_id, record_name: next_record_name)
+          temp_records << result.resource_record_sets
+          is_truncated = result.is_truncated
+        end
+
+        temp_records.flatten!
+
+        temp_records.each do |record|
           if ["A", "CNAME", "AAAA"].include?record.type
             records << record
           end
