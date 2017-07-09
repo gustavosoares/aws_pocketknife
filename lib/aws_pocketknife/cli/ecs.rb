@@ -115,7 +115,12 @@ module AwsPocketknife
                   "pending_tasks_count","running_tasks_count", "status",
                   "cpu (units)", "mem (MiB)"
                 ]
+        headers_2 = ["total",
+          "total pending", "total running",
+          "cpu_reserved / cpu_total", "mem_reserved / mem_total"
+        ]
         data = []
+        data_2 = []
         if instances.nil?
           puts "No instances found"
         else
@@ -149,13 +154,16 @@ module AwsPocketknife
             cpu_percentage = (((cpu_cluster_total - cpu_cluster_res_total)/cpu_cluster_total) * 100).round(2)
             count = count + 1
           end
-            data << ["TOTAL (#{count})", "-", "-",
-              pending_tasks_count_total, running_tasks_count_total, "-",
-              "#{cpu_cluster_res_total.round(0)} / #{cpu_cluster_total.round(0)} (#{cpu_percentage} %)", "#{mem_cluster_res_total.round(0)} / #{mem_cluster_total.round(0)} (#{mem_percentage} %)"
+            data_2 << [count,
+              pending_tasks_count_total, running_tasks_count_total,
+              "#{(cpu_cluster_total - cpu_cluster_res_total).round(0)} / #{cpu_cluster_total.round(0)} (#{cpu_percentage} %)", "#{(mem_cluster_total - mem_cluster_res_total).round(0)} / #{mem_cluster_total.round(0)} (#{mem_percentage} %)"
             ]
           AwsPocketknife::Ecs.pretty_table(headers: headers, data: data)
+          puts ""
+          puts ""
+          AwsPocketknife::Ecs.pretty_table(headers: headers_2, data: data_2)
         end
-      end      
+      end
     end
   end
 end
