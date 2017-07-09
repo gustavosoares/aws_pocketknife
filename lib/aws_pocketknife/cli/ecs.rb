@@ -119,15 +119,17 @@ module AwsPocketknife
         if instances.nil?
           puts "No instances found"
         else
+          count = 0
+          mem_cluster_total = 0.0
+          mem_cluster_res_total = 0.0
+          mem_percentage = 0.0
+          cpu_cluster_total = 0.0
+          cpu_cluster_res_total = 0.0
+          cpu_percentage = 0.0
+          pending_tasks_count_total = 0
+          running_tasks_count_total = 0
           instances.each do |instance|
             info = instance[:info]
-            # tasks = instance[:tasks]
-            # task_list = []
-            # unless tasks.empty?
-            #   tasks.tasks.each do |t|
-            #     task_list << t.task_definition_arn.split('/')[1]
-            #   end
-            # end
             cpu_total = info.registered_resources[0].integer_value
             mem_total = info.registered_resources[1].integer_value
             cpu_available = info.remaining_resources[0].integer_value
@@ -136,8 +138,21 @@ module AwsPocketknife
             data << [instance[:name], info.ec2_instance_id, connected,
               info.pending_tasks_count, info.running_tasks_count, info.status,
               "#{cpu_available} / #{cpu_total}", "#{mem_available} / #{mem_total}"
-            ]            
+            ]
+            pending_tasks_count_total = pending_tasks_count_total + info.pending_tasks_count
+            running_tasks_count_total = running_tasks_count_total + info.running_tasks_count
+            mem_cluster_total = mem_cluster_total + mem_total
+            mem_cluster_res_total = mem_cluster_res_total + mem_available
+            mem_percentage = (((mem_cluster_total - mem_cluster_res_total)/mem_cluster_total) * 100).round(2)
+            cpu_cluster_total = cpu_cluster_total + cpu_total
+            cpu_cluster_res_total = cpu_cluster_res_total + cpu_available
+            cpu_percentage = (((cpu_cluster_total - cpu_cluster_res_total)/cpu_cluster_total) * 100).round(2)
+            count = count + 1
           end
+            data << ["TOTAL (#{count})", "-", "-",
+              pending_tasks_count_total, running_tasks_count_total, "-",
+              "#{cpu_cluster_res_total.round(0)} / #{cpu_cluster_total.round(0)} (#{cpu_percentage} %)", "#{mem_cluster_res_total.round(0)} / #{mem_cluster_total.round(0)} (#{mem_percentage} %)"
+            ]
           AwsPocketknife::Ecs.pretty_table(headers: headers, data: data)
         end
       end      
