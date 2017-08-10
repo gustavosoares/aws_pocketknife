@@ -23,7 +23,7 @@ different accounts in a web browser. The only way would be to use diffente brows
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'aws-sdk-core', '~> 2.1'
+  spec.add_dependency 'aws-sdk-core', '~> 2.9'
   spec.add_dependency 'retryable', '~> 2.0'
   spec.add_dependency "rake", "~> 10.0"
   spec.add_dependency "colorize", "= 0.8.1"
