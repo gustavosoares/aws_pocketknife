@@ -147,10 +147,10 @@ module AwsPocketknife
             pending_tasks_count_total = pending_tasks_count_total + info.pending_tasks_count
             running_tasks_count_total = running_tasks_count_total + info.running_tasks_count
             mem_cluster_total = mem_cluster_total + mem_total
-            mem_cluster_res_total = mem_cluster_res_total + mem_available
+            mem_cluster_res_total = mem_cluster_res_total + mem_available if info.status == "ACTIVE"
             mem_percentage = (((mem_cluster_total - mem_cluster_res_total)/mem_cluster_total) * 100).round(2)
             cpu_cluster_total = cpu_cluster_total + cpu_total
-            cpu_cluster_res_total = cpu_cluster_res_total + cpu_available
+            cpu_cluster_res_total = cpu_cluster_res_total + cpu_available if info.status == "ACTIVE"
             cpu_percentage = (((cpu_cluster_total - cpu_cluster_res_total)/cpu_cluster_total) * 100).round(2)
             count = count + 1
           end
