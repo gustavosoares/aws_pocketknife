@@ -4,6 +4,7 @@ require "aws_pocketknife"
 module AwsPocketknife
   module Cli
     class Main < Thor
+      map %w[--version -v] => :__print_version
 
       desc "ec2 SUBCOMMAND ...ARGS", "ec2 command lines"
       subcommand "ec2", AwsPocketknife::Cli::Ec2
@@ -32,6 +33,11 @@ module AwsPocketknife
       desc "ecs SUBCOMMAND ...ARGS", "ecs command lines"
       subcommand "ecs", AwsPocketknife::Cli::Ecs
 
+      desc "--version, -v", "print the version"
+      def __print_version
+        puts AwsPocketknife::VERSION
+      end
+    
     end
   end
 end
