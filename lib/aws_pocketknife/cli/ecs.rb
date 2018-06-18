@@ -115,8 +115,8 @@ module AwsPocketknife
                   "pending_tasks_count","running_tasks_count", "status",
                   "cpu (units)", "mem (MiB)"
                 ]
-        headers_2 = ["total",
-          "total pending", "total running",
+        headers_2 = ["active", "draining", 
+          "tasks pending", "tasks running",
           "cpu_reserved / cpu_total", "mem_reserved / mem_total"
         ]
         data = []
@@ -124,7 +124,8 @@ module AwsPocketknife
         if instances.nil?
           puts "No instances found"
         else
-          count = 0
+          count_active = 0
+          count_draining = 0
           mem_cluster_total = 0.0
           mem_cluster_res_total = 0.0
           mem_percentage = 0.0
@@ -146,15 +147,16 @@ module AwsPocketknife
             ]
             pending_tasks_count_total = pending_tasks_count_total + info.pending_tasks_count
             running_tasks_count_total = running_tasks_count_total + info.running_tasks_count
-            mem_cluster_total = mem_cluster_total + mem_total
+            mem_cluster_total = mem_cluster_total + mem_total if info.status == "ACTIVE"
             mem_cluster_res_total = mem_cluster_res_total + mem_available if info.status == "ACTIVE"
             mem_percentage = (((mem_cluster_total - mem_cluster_res_total)/mem_cluster_total) * 100).round(2)
-            cpu_cluster_total = cpu_cluster_total + cpu_total
+            cpu_cluster_total = cpu_cluster_total + cpu_total if info.status == "ACTIVE"
             cpu_cluster_res_total = cpu_cluster_res_total + cpu_available if info.status == "ACTIVE"
             cpu_percentage = (((cpu_cluster_total - cpu_cluster_res_total)/cpu_cluster_total) * 100).round(2)
-            count = count + 1
+            count_active = count_active + 1 if info.status == "ACTIVE"
+            count_draining = count_draining + 1 if info.status == "DRAINING"
           end
-            data_2 << [count,
+            data_2 << [count_active, count_draining, 
               pending_tasks_count_total, running_tasks_count_total,
               "#{(cpu_cluster_total - cpu_cluster_res_total).round(0)} / #{cpu_cluster_total.round(0)} (#{cpu_percentage} %)", "#{(mem_cluster_total - mem_cluster_res_total).round(0)} / #{mem_cluster_total.round(0)} (#{mem_percentage} %)"
             ]
