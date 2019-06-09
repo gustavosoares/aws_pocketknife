@@ -112,7 +112,7 @@ module AwsPocketknife
       def list_instances(cluster)
         instances = AwsPocketknife::Ecs.list_container_instances cluster: cluster
         headers = ["name", "ec2_instance_id", "agent_connected",
-                  "pending_tasks_count","running_tasks_count", "status",
+                  "pending_tasks_count","running_tasks_count", "docker_version", "status",
                   "cpu (units)", "mem (MiB)"
                 ]
         headers_2 = ["active", "draining", 
