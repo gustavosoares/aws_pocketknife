@@ -112,8 +112,6 @@ module AwsPocketknife
       # services 
 
       def describe_services(name: '', cluster: '')
-        puts "cluster: #{cluster}"
-        puts "name: #{name}"
         ecs_client.describe_services({cluster: cluster, services: [name]}).services.first
       end
 
