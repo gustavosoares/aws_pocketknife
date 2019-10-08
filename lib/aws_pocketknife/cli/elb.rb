@@ -15,6 +15,26 @@ module AwsPocketknife
         end
       end
 
+      desc "list", "list elastic load balancer"
+      def list()
+        elbs = AwsPocketknife::Elb.list
+        print_elbs(elbs: elbs)
+      end
+
+      private
+
+      def print_elbs(elbs: [])
+        headers = ["name", "vpc_id", "security_groups", "scheme"]
+        data = []
+        if elbs.length > 0
+          elbs.each do |elb|
+            data << [elb.load_balancer_name, elb.vpc_id, elb.security_groups.join(", "), elb.scheme]
+          end
+          AwsPocketknife::Elb.pretty_table(headers: headers, data: data)
+        else
+          puts "No elb(s) found for name #{args[:name]}"
+        end
+      end
     end
   end
 end
