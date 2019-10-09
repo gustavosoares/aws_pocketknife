@@ -50,6 +50,10 @@ module AwsPocketknife
       @elb_client ||= Aws::ElasticLoadBalancing::Client.new(get_client_options)
     end
 
+    def elb_clientV2
+      @elb_clientV2 ||= Aws::ElasticLoadBalancingV2::Client.new(get_client_options)
+    end
+
     def asg_client
       @asg_client ||= Aws::AutoScaling::Client.new(get_client_options)
     end
