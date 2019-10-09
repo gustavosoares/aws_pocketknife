@@ -31,6 +31,10 @@ module AwsPocketknife
         @elb_client ||= AwsPocketknife.elb_client
       end
 
+      def elb_clientV2
+        @elb_clientV2 ||= AwsPocketknife.elb_clientV2
+      end
+  
       def asg_client
         @asg_client ||= AwsPocketknife.asg_client
       end

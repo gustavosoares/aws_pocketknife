@@ -112,6 +112,17 @@ Commands:
   pocketknife route53 update_record HOSTED_ZONE ORIGIN_DNS_NAME DESTINY_RECORD_NAME DESTINY_HOSTED_ZONE RECORD_TYPE (default to A)  # Update a dns record from an existing dns entry.
 ```
 
+### ELB
+
+```
+$ pocketknife elb
+Commands:
+  pocketknife elb desc ELB_NAME   # describe elastic load balancer
+  pocketknife elb help [COMMAND]  # Describe subcommands or one specific subcommand
+  pocketknife elb list            # list elastic load balancer
+  pocketknife elb list_v2         # list load balancers using v2 api (application and network loadbalancers)
+```
+
 ### ECS
 
 ```
