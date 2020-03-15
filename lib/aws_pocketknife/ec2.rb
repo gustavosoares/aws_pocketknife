@@ -75,7 +75,9 @@ module AwsPocketknife
         Logging.info "options: #{options}"
 
         dry_run = options.fetch(:dry_run, true)
+        Logging.info "Finding AMIs by creation time"
         image_ids = find_ami_by_creation_time(options)
+        Logging.info "Done. Finding unusued AMIs now..."
         images_to_delete = find_unused_ami(image_ids: image_ids)
 
         Logging.info "images (#{image_ids.length}): #{image_ids}"
@@ -93,6 +95,7 @@ module AwsPocketknife
         images_to_delete = []
         image_ids.each do |image_id|
           # check if there is any instance using the image id
+          Logging.info "Checking if #{image_id} can be deleted..."
           instances = describe_instances_by_image_id(image_id_list: [image_id])
           if instances.empty?
             images_to_delete << image_id
@@ -114,8 +117,8 @@ module AwsPocketknife
         images = find_ami_by_name(name: options.fetch(:ami_name_pattern, ''))
         images.each do |image|
           image_creation_time = Time.parse(image.creation_date)
-          msg = "image #{image.image_id} (#{creation_time}) < (image_creation_time: #{image_creation_time})? "
-          if creation_time <= image_creation_time
+          msg = "image #{image.name} (#{image.image_id}) (image_creation_time: #{image_creation_time}) < (#{creation_time}) ? "
+          if image_creation_time <= creation_time
             image_ids << image.image_id
             msg << "YES, marking to be deleted"
           else
@@ -123,6 +126,7 @@ module AwsPocketknife
           end
           Logging.info msg
         end
+        Logging.info "Done reading AMIs"
         return image_ids
       end
 
