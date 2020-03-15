@@ -78,6 +78,10 @@ module AwsPocketknife
       @ecs_client ||= Aws::ECS::Client.new(get_client_options)
     end
 
+    def aws_backup_client
+      @aws_backup_client ||= Aws::Backup::Client.new(get_client_options)
+    end
+
     def route53_client
       @route53_client ||= Aws::Route53::Client.new(get_client_options)
     end

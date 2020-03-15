@@ -7,6 +7,10 @@ module AwsPocketknife
     module Utils
       #include AwsPocketknife::Common::Logging
 
+      def aws_backup_client
+        @aws_backup_client ||= AwsPocketknife.aws_backup_client
+      end
+  
       def ec2_client
         @ec2_client ||= AwsPocketknife.ec2_client
       end

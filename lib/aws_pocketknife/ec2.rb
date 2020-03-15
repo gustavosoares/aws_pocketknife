@@ -40,19 +40,25 @@ module AwsPocketknife
 
       def delete_ami_by_id(id: '', name: '')
         Logging.info "deleting image #{name} (#{id})"
-        image = find_ami_by_id(id: id)
-        snapshot_ids = snapshot_ids(image)
-        ec2_client.deregister_image(image_id: id)
-
-        Retryable.retryable(:tries => 20, :sleep => lambda { |n| 2**n }, :on => StandardError) do |retries, exception|
+        if name.start_with?("AwsBackup")
+          Logging.warn "AWS backup image not supported yet"
+          #delete_aws_backup_ami(ami_id: id)
+        else
           image = find_ami_by_id(id: id)
-          message =  "retry #{retries} - Deleting image #{id}"
-          message << " State: #{image.state}" if image
-          Logging.info message
-          raise StandardError unless image.nil?
+          snapshot_ids = snapshot_ids(image)
+          ec2_client.deregister_image(image_id: id)
+  
+          Retryable.retryable(:tries => 20, :sleep => lambda { |n| 2**n }, :on => StandardError) do |retries, exception|
+            image = find_ami_by_id(id: id)
+            message =  "retry #{retries} - Deleting image #{id}"
+            message << " State: #{image.state}" if image
+            Logging.info message
+            raise StandardError unless image.nil?
+          end
+  
+          delete_snapshots(snapshot_ids: snapshot_ids)
         end
 
-        delete_snapshots(snapshot_ids: snapshot_ids)
       end
 
       def delete_snapshots(snapshot_ids: [])
@@ -60,6 +66,14 @@ module AwsPocketknife
           Logging.info "Deleting Snapshot: #{snapshot_id}"
           ec2_client.delete_snapshot(snapshot_id: snapshot_id)
         end
+      end
+
+      def delete_aws_backup_ami(ami_id: '', backup_vault_name: 'default')
+        recovery_point_arn = "arn:aws:ec2:us-west-2::image/#{ami_id}"
+        resp = ec2_client.delete_recovery_point({
+          backup_vault_name: backup_vault_name, # required
+          recovery_point_arn: recovery_point_arn, # required
+        })
       end
 
       def snapshot_ids(image)
@@ -95,7 +109,7 @@ module AwsPocketknife
         images_to_delete = {}
         image_ids.each do |image_id,image_name|
           # check if there is any instance using the image id
-          Logging.info "Checking if #{image_id} can be deleted..."
+          Logging.info "Checking if #{image_name} (#{image_id}) can be deleted..."
           instances = describe_instances_by_image_id(image_id_list: [image_id])
           if instances.empty?
             images_to_delete[image_id] = image_name
