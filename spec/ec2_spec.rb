@@ -22,13 +22,13 @@ describe AwsPocketknife::Ec2 do
 
   describe '#find_unused_ami' do
 
-    let(:image_ids) {['1', '2', '3']}
+    let(:image_ids) { {'1' => 'test_1', '2' => 'test_2', '3' => 'test_3'} }
 
     before (:each) do
       allow(Kernel).to receive(:sleep)
     end
 
-    it 'should return list with ami that can be deleted' do
+    it 'should return hash with ami that can be deleted' do
 
       first_response = [get_instance_response(instance_id: 'i-1')]
       second_response = [get_instance_response(instance_id: 'i-2')]
@@ -37,11 +37,11 @@ describe AwsPocketknife::Ec2 do
       allow(AwsPocketknife::Ec2).to receive(:describe_instances_by_image_id).and_return(first_response, second_response, third_response)
 
       images_to_delete = AwsPocketknife::Ec2.find_unused_ami(image_ids: image_ids)
-      expect(images_to_delete).to eq(['3'])
+      expect(images_to_delete).to eq({'3' => 'test_3'})
 
     end
 
-    it 'should return empty list when all amis are in use' do
+    it 'should return empty hash when all amis are in use' do
 
       first_response = [get_instance_response(instance_id: 'i-1')]
       second_response = [get_instance_response(instance_id: 'i-2')]
@@ -49,7 +49,7 @@ describe AwsPocketknife::Ec2 do
       allow(AwsPocketknife::Ec2).to receive(:describe_instances_by_image_id).and_return(first_response, second_response)
 
       images_to_delete = AwsPocketknife::Ec2.find_unused_ami(image_ids: image_ids)
-      expect(images_to_delete).to eq([])
+      expect(images_to_delete).to eq({})
 
     end
 
@@ -69,7 +69,7 @@ describe AwsPocketknife::Ec2 do
       allow(subject).to receive(:find_ami_by_name).and_return([first_response, second_response])
 
       image_ids = subject.find_ami_by_creation_time(options)
-      expect(image_ids).to eq(['2'])
+      expect(image_ids).to eq({"1"=>"test_1"})
 
     end
 
@@ -81,7 +81,7 @@ describe AwsPocketknife::Ec2 do
       allow(subject).to receive(:find_ami_by_name).and_return([first_response, second_response])
 
       image_ids = subject.find_ami_by_creation_time(options)
-      expect(image_ids).to eq([])
+      expect(image_ids).to eq({"1"=>"test_1", "2"=>"test_2"})
 
     end
 

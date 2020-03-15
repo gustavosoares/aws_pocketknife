@@ -11,7 +11,7 @@ def get_image_response(image_id: '', date: '2040-12-16 11:57:42 +1100', state: A
   if image_id.empty?
     return nil
   else
-    get_aws_response({image_id: image_id, state: state, creation_date: date,
+    get_aws_response({image_id: image_id, name: "test_#{image_id}", state: state, creation_date: date,
                       block_device_mappings: [
                           {ebs: {snapshot_id: snapshot_id}}
                       ]
