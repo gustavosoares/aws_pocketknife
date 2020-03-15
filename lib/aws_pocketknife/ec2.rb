@@ -38,8 +38,8 @@ module AwsPocketknife
                                     image_ids: [id]}).images.first
       end
 
-      def delete_ami_by_id(id: '')
-        Logging.info "deleting image #{id}"
+      def delete_ami_by_id(id: '', name: '')
+        Logging.info "deleting image #{name} (#{id})"
         image = find_ami_by_id(id: id)
         snapshot_ids = snapshot_ids(image)
         ec2_client.deregister_image(image_id: id)
@@ -84,21 +84,21 @@ module AwsPocketknife
         Logging.info "images to delete (#{images_to_delete.length}): #{images_to_delete}"
 
         unless dry_run
-          images_to_delete.each do |image_id|
-            delete_ami_by_id(id: image_id)
+          images_to_delete.each do |image_id,image_name|
+            delete_ami_by_id(id: image_id, name: image_name)
           end
         end
 
       end
 
-      def find_unused_ami(image_ids: [])
-        images_to_delete = []
-        image_ids.each do |image_id|
+      def find_unused_ami(image_ids: {})
+        images_to_delete = {}
+        image_ids.each do |image_id,image_name|
           # check if there is any instance using the image id
           Logging.info "Checking if #{image_id} can be deleted..."
           instances = describe_instances_by_image_id(image_id_list: [image_id])
           if instances.empty?
-            images_to_delete << image_id
+            images_to_delete[image_id] = image_name
           else
             Logging.info "#{image_id} is used by instance #{instances.map { |instance| instance.instance_id }}"
           end
@@ -108,18 +108,19 @@ module AwsPocketknife
       end
 
       def find_ami_by_creation_time(options)
+        # Returns hash Image.Id => Image.name
 
         days = options.fetch(:days, '30').to_i * 24 * 3600
         creation_time = Time.now-days
         Logging.info "Cleaning up images older than #{days} days, i.e, with creation_time < #{creation_time})"
 
-        image_ids = []
+        image_ids = {}
         images = find_ami_by_name(name: options.fetch(:ami_name_pattern, ''))
         images.each do |image|
           image_creation_time = Time.parse(image.creation_date)
           msg = "image #{image.name} (#{image.image_id}) (image_creation_time: #{image_creation_time}) < (#{creation_time}) ? "
           if image_creation_time <= creation_time
-            image_ids << image.image_id
+            image_ids[image.image_id] = image.name
             msg << "YES, marking to be deleted"
           else
             msg << "NO"
