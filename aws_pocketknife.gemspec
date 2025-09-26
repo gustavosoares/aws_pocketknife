@@ -50,6 +50,5 @@ different accounts in a web browser. The only way would be to use diffente brows
 
   spec.add_development_dependency "bundler", ">= 2.2.18"
   spec.add_development_dependency "rspec", "~> 3.4"
-  spec.add_development_dependency "debase", "= 0.2.2.beta6"
-  spec.add_development_dependency "webmock", "= 1.24.2"
+  spec.add_development_dependency "webmock", "~> 3.0"
 end
