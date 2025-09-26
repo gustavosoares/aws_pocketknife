@@ -48,7 +48,7 @@ different accounts in a web browser. The only way would be to use diffente brows
   spec.add_dependency "thor", "~> 1.0"
   spec.add_dependency "webrick", "~> 1.7"  # Required for Ruby 3.0+
 
-  spec.add_development_dependency "bundler", "~> 1.11"
+  spec.add_development_dependency "bundler", ">= 2.2.18"
   spec.add_development_dependency "rspec", "~> 3.4"
   spec.add_development_dependency "debase", "= 0.2.2.beta6"
   spec.add_development_dependency "webmock", "= 1.24.2"
